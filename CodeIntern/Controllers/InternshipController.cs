@@ -4,22 +4,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CodeIntern.Controllers
 {
-    public class CompanyController : Controller
+    public class InternshipController : Controller
     {
         private readonly ApplicationDbContext _db;
-        public CompanyController(ApplicationDbContext db) 
+        public InternshipController(ApplicationDbContext db)
         {
             _db = db;
         }
         public IActionResult Index()
         {
-            List<Company> companiesList = _db.Company.ToList();
-            return View(companiesList);
+            List<Internship> InternshipsList = _db.Internship.ToList();
+            return View(InternshipsList);
         }
         public IActionResult Details(int id)
         {
-            Company? CompanyFromDb = _db.Company.Find(id);
-            return View(CompanyFromDb);
+            Internship? InternshipFromDb = _db.Internship.Find(id);
+            return View(InternshipFromDb);
         }
 
         public IActionResult Create()
@@ -27,10 +27,10 @@ namespace CodeIntern.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(Company obj)
+        public IActionResult Create(Internship obj)
         {
-            _db.Company.Add(obj);
-            _db.SaveChanges();  
+            _db.Internship.Add(obj);
+            _db.SaveChanges();
             return RedirectToAction("Index");
         }
 
@@ -41,22 +41,22 @@ namespace CodeIntern.Controllers
             {
                 return NotFound();
             }
-            //Company? CompanyFromDb = _unitOfWork.Company.Get(u => u.Id == id);
-            Company? CompanyFromDb1 = _db.Company.FirstOrDefault(u=>u.CompanyId==id);
-            //Company? CompanyFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
+            //Internship? InternshipFromDb = _unitOfWork.Internship.Get(u => u.Id == id);
+            Internship? InternshipFromDb1 = _db.Internship.FirstOrDefault(u => u.InternshipId == id);
+            //Internship? InternshipFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
 
-            if (CompanyFromDb1 == null)
+            if (InternshipFromDb1 == null)
             {
                 return NotFound();
             }
-            return View(CompanyFromDb1);
+            return View(InternshipFromDb1);
         }
         [HttpPost]
-        public IActionResult Edit(Company obj)
+        public IActionResult Edit(Internship obj)
         {
             if (ModelState.IsValid)
             {
-                _db.Company.Update(obj);
+                _db.Internship.Update(obj);
                 _db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -70,25 +70,25 @@ namespace CodeIntern.Controllers
             {
                 return NotFound();
             }
-            Company? CompanyFromDb = _db.Company.Find(id);
+            Internship? InternshipFromDb = _db.Internship.Find(id);
 
-            if (CompanyFromDb == null)
+            if (InternshipFromDb == null)
             {
                 return NotFound();
             }
-            return View(CompanyFromDb);
+            return View(InternshipFromDb);
         }
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(int? id)
         {
-            Company? obj = _db.Company.Find(id);
+            Internship? obj = _db.Internship.Find(id);
             if (obj == null)
             {
                 return NotFound();
             }
-            _db.Company.Remove(obj);
+            _db.Internship.Remove(obj);
             _db.SaveChanges(true);
-            TempData["success"] = "Company deleted successfully";
+            TempData["success"] = "Internship deleted successfully";
             return RedirectToAction("Index");
         }
     }
