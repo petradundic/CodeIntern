@@ -21,14 +21,10 @@ namespace CodeIntern.Models
         
         public string ResumeFile { get; set; }
 
-        public string CoverLetter { get; set; }
-
         [Required]
-        [StringLength(10)]
         public string Status { get; set; }
 
         [Required]
-        [DataType(DataType.Date)]
         public DateTime AppliedDate { get; set; }
         [Required]
         public string StudentFirstName { get; set; }

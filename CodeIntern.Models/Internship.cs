@@ -17,7 +17,8 @@ namespace CodeIntern.Models
         public int CompanyId { get; set; }
 
         [Required]
-
+        public string CompanyName { get; set; }
+        [Required]
         public string Title { get; set; }
 
         [Required]
