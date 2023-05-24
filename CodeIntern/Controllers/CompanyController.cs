@@ -1,4 +1,5 @@
 ﻿using CodeIntern.DataAccess.Data;
+using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,19 +7,19 @@ namespace CodeIntern.Controllers
 {
     public class CompanyController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public CompanyController(ApplicationDbContext db) 
+        private readonly ICompanyRepository _companyRepo;
+        public CompanyController(ICompanyRepository db) 
         {
-            _db = db;
+            _companyRepo = db;
         }
         public IActionResult Index()
         {
-            List<Company> companiesList = _db.Company.ToList();
+            List<Company> companiesList = _companyRepo.GetAll().ToList();
             return View(companiesList);
         }
         public IActionResult Details(int id)
         {
-            Company? CompanyFromDb = _db.Company.Find(id);
+            Company? CompanyFromDb = _companyRepo.Get(x=>x.CompanyId==id);
             return View(CompanyFromDb);
         }
 
@@ -29,8 +30,10 @@ namespace CodeIntern.Controllers
         [HttpPost]
         public IActionResult Create(Company obj)
         {
-            _db.Company.Add(obj);
-            _db.SaveChanges();  
+            obj.RegistrationRequest = true;
+            obj.RegistrationReqDate = DateTime.Now;
+            _companyRepo.Add(obj);
+            _companyRepo.Save();  
             return RedirectToAction("Index");
         }
 
@@ -42,7 +45,7 @@ namespace CodeIntern.Controllers
                 return NotFound();
             }
             //Company? CompanyFromDb = _unitOfWork.Company.Get(u => u.Id == id);
-            Company? CompanyFromDb1 = _db.Company.FirstOrDefault(u=>u.CompanyId==id);
+            Company? CompanyFromDb1 = _companyRepo.Get(u=>u.CompanyId==id);
             //Company? CompanyFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
 
             if (CompanyFromDb1 == null)
@@ -56,8 +59,8 @@ namespace CodeIntern.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Company.Update(obj);
-                _db.SaveChanges();
+                _companyRepo.Update(obj);
+                _companyRepo.Save();
                 return RedirectToAction("Index");
             }
             return View();
@@ -70,7 +73,7 @@ namespace CodeIntern.Controllers
             {
                 return NotFound();
             }
-            Company? CompanyFromDb = _db.Company.Find(id);
+            Company? CompanyFromDb = _companyRepo.Get(x=>x.CompanyId==id);
 
             if (CompanyFromDb == null)
             {
@@ -81,13 +84,13 @@ namespace CodeIntern.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(int? id)
         {
-            Company? obj = _db.Company.Find(id);
+            Company? obj = _companyRepo.Get(x => x.CompanyId == id);
             if (obj == null)
             {
                 return NotFound();
             }
-            _db.Company.Remove(obj);
-            _db.SaveChanges(true);
+            _companyRepo.Remove(obj);
+            _companyRepo.Save();
             TempData["success"] = "Company deleted successfully";
             return RedirectToAction("Index");
         }

@@ -1,1 +1,45 @@
-﻿<h2>Details</h2>
+﻿@model Company
+<h2>@Model.CompanyName</h2>
+<div>
+<div class="row">
+    <div class ="row">
+        <p>@Model.Website</p>
+    </div>
+    <div class="row">
+        <p>@Model.Email</p>
+    </div>
+    <div class="row">
+        <p>@Model.Description</p>
+    </div>
+    <div class="row">
+        <p>@Model.Country</p>
+    </div>
+    <div class="row">
+        <p>@Model.City</p>
+    </div>
+    <div class="row">
+        <p>@Model.Address</p>
+    </div>
+    <div class="row">
+        <p>@Model.Industry</p>
+    </div>
+       
+</div>
+
+<div>
+        <div class="row pt-2">
+            @if(User.IsInRole(SD.Role_Admin) && Model.RegistrationRequest==true){
+            <div class="col-6 col-md-3">
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-primary border  form-control">
+                    Register Company
+                </a>
+            </div>
+            }
+            <div class="col-6 col-md-3">
+                <a asp-controller="Company" asp-action="Index" class="btn btn-outline-primary border  form-control">
+                    Back to List
+                </a>
+            </div>
+        </div>
+</div>
+</div>

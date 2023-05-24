@@ -11,6 +11,7 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using CodeIntern.Models;
+using CodeIntern.Utility;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -21,6 +22,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using CodeIntern.DataAccess.Repository;
+using CodeIntern.DataAccess.Repository.IRepository;
 
 namespace CodeIntern.Areas.Identity.Pages.Account
 {
@@ -33,6 +36,7 @@ namespace CodeIntern.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ICompanyRepository _companyRepo;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -40,7 +44,8 @@ namespace CodeIntern.Areas.Identity.Pages.Account
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ICompanyRepository companyRepo)
         {
             _roleManager= roleManager;
             _userManager = userManager;
@@ -49,6 +54,7 @@ namespace CodeIntern.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _companyRepo = companyRepo;
         }
 
         /// <summary>
@@ -108,6 +114,13 @@ namespace CodeIntern.Areas.Identity.Pages.Account
             public string? Role { get; set; }
             [ValidateNever]
             public IEnumerable<SelectListItem> RoleList { get; set;}
+
+            [Required]
+            public int? CompanyId { get; set; }
+            [ValidateNever]
+            public IEnumerable<SelectListItem> CompanyList { get; set; }
+
+       
         }
 
 
@@ -120,7 +133,13 @@ namespace CodeIntern.Areas.Identity.Pages.Account
                     Text=i,
                     Value=i
 
-                })
+                }),
+                 CompanyList = _companyRepo.GetAll().Select(i => new SelectListItem
+                 {
+                     Text = i.CompanyName,
+                     Value = i.CompanyId.ToString()
+
+                 })
             };
 
             ReturnUrl = returnUrl;
@@ -139,9 +158,27 @@ namespace CodeIntern.Areas.Identity.Pages.Account
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
+                if (Input.Role == SD.Role_Company)
+                {
+                    user.CompanyId = Input.CompanyId;
+
+                    Company company=_companyRepo.Get(x=>x.CompanyId==Input.CompanyId);
+                    company.RegistrationApprovedDate=DateTime.Now;
+                    company.RegistrationRequest = false;
+                    _companyRepo.Update(company);
+                }
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    if(!String.IsNullOrEmpty(Input.Role))
+                    {
+                        await _userManager.AddToRoleAsync(user, Input.Role);
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, SD.Role_Student);
+                    }
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
