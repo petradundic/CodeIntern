@@ -1,5 +1,6 @@
 ﻿using CodeIntern.DataAccess.Data;
 using CodeIntern.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodeIntern.Controllers
@@ -7,9 +8,11 @@ namespace CodeIntern.Controllers
     public class InternshipController : Controller
     {
         private readonly ApplicationDbContext _db;
-        public InternshipController(ApplicationDbContext db)
+        private readonly UserManager<IdentityUser> _userManager;
+        public InternshipController(ApplicationDbContext db, UserManager<IdentityUser> userManager)
         {
             _db = db;
+            _userManager = userManager;
         }
         public IActionResult Index()
         {
@@ -29,6 +32,9 @@ namespace CodeIntern.Controllers
         [HttpPost]
         public IActionResult Create(Internship obj)
         {
+            var userId = _userManager.GetUserId(User);
+            obj.CompanyId = userId;
+            obj.CreatedDate = DateTime.Now;
             _db.Internship.Add(obj);
             _db.SaveChanges();
             return RedirectToAction("Index");

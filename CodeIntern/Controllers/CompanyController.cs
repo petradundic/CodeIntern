@@ -1,6 +1,7 @@
 ﻿using CodeIntern.DataAccess.Data;
 using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
+using CodeIntern.Utility;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodeIntern.Controllers
@@ -14,8 +15,15 @@ namespace CodeIntern.Controllers
         }
         public IActionResult Index()
         {
-            List<Company> companiesList = _companyRepo.GetAll().ToList();
-            return View(companiesList);
+
+            List<Company> companiesList = _companyRepo.GetAll(x => x.RegistrationRequest == false).ToList();
+
+            if (User.IsInRole(SD.Role_Admin))
+            {
+                companiesList = _companyRepo.GetAll().ToList();
+            }
+
+                return View(companiesList);
         }
         public IActionResult Details(int id)
         {

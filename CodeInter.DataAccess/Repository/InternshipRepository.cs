@@ -1,0 +1,31 @@
+﻿using CodeIntern.DataAccess.Data;
+using CodeIntern.DataAccess.Repository.IRepository;
+using CodeIntern.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CodeIntern.DataAccess.Repository
+{
+    public class InternshipRepository : Repository<Internship>, IInternshipRepository
+    {
+        private ApplicationDbContext _db;
+        public InternshipRepository(ApplicationDbContext db) : base(db)
+        {
+            _db = db;
+        }
+
+        public void Save()
+        {
+            _db.SaveChanges();
+        }
+
+        public void Update(Internship obj)
+        {
+            _db.Internship.Update(obj);
+        }
+    }
+}

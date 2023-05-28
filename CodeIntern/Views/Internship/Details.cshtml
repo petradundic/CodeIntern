@@ -1,1 +1,43 @@
-﻿<h2>Internship details</h2>
+﻿@model Internship
+<h2>@Model.CompanyName</h2>
+<div>
+    <div class="row">
+        <div class="row">
+            <p>@Model.CompanyName</p>
+        </div>
+        <div class="row">
+            <p>@Model.Title</p>
+        </div>
+        <div class="row">
+            <p>@Model.Description</p>
+        </div>
+        
+        <div class="row">
+            <p>@Model.Location</p>
+        </div>
+        <div class="row">
+            <p>@Model.StartDate</p>
+        </div>
+        <div class="row">
+            <p>@Model.EndDate</p>
+        </div>
+
+    </div>
+
+    <div>
+        <div class="row pt-2">
+             @if (User.IsInRole(SD.Role_Student)){
+            <div class="col-6 col-md-3">
+                <a asp-controller="Company" asp-action="Index" class="btn btn-outline-primary border  form-control">
+                    Apply for internship
+                </a>
+            </div>
+            }
+            <div class="col-6 col-md-3">
+                <a asp-controller="Internship" asp-action="Index" class="btn btn-outline-primary border  form-control">
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -13,8 +13,9 @@ namespace CodeIntern.Models
         [Key]
         public int InternshipId { get; set; }
 
-        [ForeignKey("CompanyId")]
-        public int CompanyId { get; set; }
+        [Required]
+
+        public string CompanyId { get; set; }
 
         [Required]
         public string CompanyName { get; set; }
@@ -45,6 +46,8 @@ namespace CodeIntern.Models
         [Required]
         public DateTime CreatedDate { get; set; }
 
-        public Company Company { get; set; }
+        public int NumOfApplications { get; set; }  
+
     }
 }
+ 

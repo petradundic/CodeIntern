@@ -28,6 +28,7 @@ namespace CodeIntern.Models
         public bool? RegistrationRequest { get; set; }   
         public DateTime? RegistrationReqDate { get; set;}
         public DateTime? RegistrationApprovedDate { get; set; }
+        public string? ImageUrl { get; set; }   
 
     }
 }
