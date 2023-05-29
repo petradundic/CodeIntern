@@ -113,12 +113,11 @@ namespace CodeIntern.Areas.Identity.Pages.Account
 
             public string? Role { get; set; }
             [ValidateNever]
-            public IEnumerable<SelectListItem> RoleList { get; set;}
+            public IEnumerable<SelectListItem>? RoleList { get; set;}
 
-            [Required]
             public int? CompanyId { get; set; }
             [ValidateNever]
-            public IEnumerable<SelectListItem> CompanyList { get; set; }
+            public IEnumerable<SelectListItem>? CompanyList { get; set; }
 
        
         }
@@ -150,6 +149,7 @@ namespace CodeIntern.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -158,6 +158,11 @@ namespace CodeIntern.Areas.Identity.Pages.Account
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
+                if (String.IsNullOrEmpty(Input.Role))
+                {
+                    Input.Role = SD.Role_Student;
+                    await _userManager.AddToRoleAsync(user, Input.Role);
+                }
                 if (Input.Role == SD.Role_Company)
                 {
                     user.CompanyId = Input.CompanyId;
@@ -167,18 +172,11 @@ namespace CodeIntern.Areas.Identity.Pages.Account
                     company.RegistrationRequest = false;
                     _companyRepo.Update(company);
                 }
+
+                
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-
-                    if(!String.IsNullOrEmpty(Input.Role))
-                    {
-                        await _userManager.AddToRoleAsync(user, Input.Role);
-                    }
-                    else
-                    {
-                        await _userManager.AddToRoleAsync(user, SD.Role_Student);
-                    }
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

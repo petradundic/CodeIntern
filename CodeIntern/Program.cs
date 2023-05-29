@@ -24,6 +24,7 @@ builder.Services.ConfigureApplicationCookie(options => {
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ICompanyRepository,CompanyRepository>();
 builder.Services.AddScoped<IInternshipRepository, InternshipRepository>();
+builder.Services.AddScoped<IInternApplicationRepository, InternApplicationRepository>();
 builder.Services.AddScoped<IEmailSender,EmailSender>();
 var app = builder.Build();
 

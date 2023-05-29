@@ -28,7 +28,7 @@
         <div class="row pt-2">
              @if (User.IsInRole(SD.Role_Student)){
             <div class="col-6 col-md-3">
-                <a asp-controller="Company" asp-action="Index" class="btn btn-outline-primary border  form-control">
+                    <a asp-controller="InternshipApplication" asp-action="Create" asp-route-internshipId="@Model.InternshipId"  class="btn btn-outline-primary border  form-control">
                     Apply for internship
                 </a>
             </div>

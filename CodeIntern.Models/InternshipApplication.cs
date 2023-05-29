@@ -15,16 +15,19 @@ namespace CodeIntern.Models
         public int InternshipId { get; set; }
         [Required]
 
+        public string StudentId { get; set; }
+        [Required]
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
         [Required]
         public string Email { get; set; }
         [Required]
-       public string CVUrl { get; set; } = string.Empty;
+       public string? CVUrl { get; set; } = string.Empty;
 
         public DateTime? DateCreated { get; set; }
         public string? Status { get; set; }
+
 
         
     }
