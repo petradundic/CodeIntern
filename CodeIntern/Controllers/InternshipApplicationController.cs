@@ -17,9 +17,18 @@ namespace CodeIntern.Controllers
             _internshipRepository = internshipRepository;
             _userManager = userManager;
         }
-        public IActionResult Index()
+        public IActionResult Index(int? internshipId)
         {
-            return View();
+            List<InternshipApplication> applications = null;
+            if(internshipId != null)
+            {
+                applications = _internApplicationRepo.GetAll(x=>x.InternshipId==internshipId).ToList();
+            }
+            else
+            {
+                applications = _internApplicationRepo.GetAll().ToList();
+            }
+            return View(applications);
         }
         public IActionResult Details(int id)
         {

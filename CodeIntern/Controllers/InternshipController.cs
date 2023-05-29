@@ -14,13 +14,15 @@ namespace CodeIntern.Controllers
             _db = db;
             _userManager = userManager;
         }
-        public IActionResult Index()
+        public IActionResult Index(string? companyId)
         {
             List<Internship> InternshipsList = _db.Internship.ToList();
             return View(InternshipsList);
         }
         public IActionResult Details(int id)
         {
+            var userId = _userManager.GetUserId(User);
+            ViewBag.UserId = userId;
             Internship? InternshipFromDb = _db.Internship.Find(id);
             return View(InternshipFromDb);
         }

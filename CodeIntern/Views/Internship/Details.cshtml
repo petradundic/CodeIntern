@@ -33,6 +33,15 @@
                 </a>
             </div>
             }
+            @if (!User.IsInRole(SD.Role_Student) && Model.NumOfApplications != 0 && Model.CompanyId==ViewBag.UserId)
+            {
+                <div class="col-6 col-md-3">
+                    <a asp-controller="InternshipApplication" asp-action="Index" asp-route-internshipId="@Model.InternshipId" class="btn btn-outline-primary border  form-control">
+                        See all applications
+                    </a>
+                </div>
+            }
+
             <div class="col-6 col-md-3">
                 <a asp-controller="Internship" asp-action="Index" class="btn btn-outline-primary border  form-control">
                     Back to List
