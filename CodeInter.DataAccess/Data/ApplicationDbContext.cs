@@ -16,5 +16,6 @@ namespace CodeIntern.DataAccess.Data
         public DbSet<Internship> Internship { get; set; }
         public DbSet<Company> Company { get; set; }
         public DbSet<InternshipApplication> InternshipApplication { get; set;}
+        public DbSet<SavedInternship> SavedInternship { get; set; }
     }
 }

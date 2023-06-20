@@ -1,7 +1,9 @@
 ﻿using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CodeIntern.Controllers
 {
@@ -41,22 +43,23 @@ namespace CodeIntern.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(InternshipApplication obj, int InternshipId)
+        public  IActionResult Create(InternshipApplication obj, int InternshipId)
         {
-            
-                Internship internship = _internshipRepository.Get(x => x.InternshipId == InternshipId);
-                var userId = _userManager.GetUserId(User);
 
-                obj.InternshipId = InternshipId;
-                obj.StudentId=userId;
-                obj.DateCreated = DateTime.Now;
-                obj.Status = "Applied";
-                _internApplicationRepo.Add(obj);
-                _internApplicationRepo.Save();
-                internship.NumOfApplications += 1;
-                _internshipRepository.Update(internship);
-                _internshipRepository.Save();
-           
+            Internship internship = _internshipRepository.Get(x => x.InternshipId == InternshipId);
+            var userId = _userManager.GetUserId(User);
+
+            obj.InternshipId = InternshipId;
+            obj.StudentId = userId;
+            obj.DateCreated = DateTime.Now;
+            obj.Status = "Applied";
+
+            _internApplicationRepo.Add(obj);
+            _internApplicationRepo.Save();
+            internship.NumOfApplications += 1;
+            _internshipRepository.Update(internship);
+            _internshipRepository.Save();
+
             return RedirectToAction("Index");
         }
 

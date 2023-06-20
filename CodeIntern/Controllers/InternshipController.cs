@@ -1,4 +1,6 @@
 ﻿using CodeIntern.DataAccess.Data;
+using CodeIntern.DataAccess.Repository;
+using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,11 +10,13 @@ namespace CodeIntern.Controllers
     public class InternshipController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly ISavedInternRepository _savedInternRepo;
         private readonly UserManager<IdentityUser> _userManager;
-        public InternshipController(ApplicationDbContext db, UserManager<IdentityUser> userManager)
+        public InternshipController(ApplicationDbContext db, UserManager<IdentityUser> userManager, ISavedInternRepository savedInternRepo)
         {
             _db = db;
             _userManager = userManager;
+            _savedInternRepo = savedInternRepo;
         }
         public IActionResult Index(string? companyId)
         {
@@ -25,6 +29,22 @@ namespace CodeIntern.Controllers
             ViewBag.UserId = userId;
             Internship? InternshipFromDb = _db.Internship.Find(id);
             return View(InternshipFromDb);
+        }
+        public IActionResult SaveInternship(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+            SavedInternship savedInternship = new SavedInternship();
+            savedInternship.InternshipId = id;
+            savedInternship.DateSaved = DateTime.Now;
+            if (userId != null)
+            {
+                savedInternship.StudentId = userId;
+                _savedInternRepo.Add(savedInternship);
+                _savedInternRepo.Save();
+            }
+
+
+            return RedirectToAction("Index");
         }
 
         public IActionResult Create()

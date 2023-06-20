@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace CodeIntern.Models
         [Required]
         public string Email { get; set; }
         [Required]
-       public string? CVUrl { get; set; } = string.Empty;
+        public byte[] CV { get; set; } 
 
         public DateTime? DateCreated { get; set; }
         public string? Status { get; set; }

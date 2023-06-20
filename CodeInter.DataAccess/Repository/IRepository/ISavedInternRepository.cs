@@ -7,11 +7,8 @@ using System.Threading.Tasks;
 
 namespace CodeIntern.DataAccess.Repository.IRepository
 {
-    public interface IInternApplicationRepository : IRepository<InternshipApplication>
+    public interface ISavedInternRepository : IRepository<SavedInternship>
     {
-        void Update(InternshipApplication obj);
         void Save();
-
-     
     }
 }

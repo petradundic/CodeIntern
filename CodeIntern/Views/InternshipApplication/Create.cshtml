@@ -9,7 +9,7 @@
         </div>
     </div>
     <div class="card-body p-4">
-        <form method="post" class="row">
+        <form method="post" class="row" enctype="multipart/form-data">
             <div class="border p-3">
                 <div class="form-floating py-2 col-12">
                     <input asp-for="FirstName" class="form-control border-0 shadow" />
@@ -25,8 +25,8 @@
                     <label asp-for="Email" class="ms-2"></label>
                 </div>
                 <div class="form-floating py-2 col-12">
-                    <input asp-for="CVUrl" class="form-control border-0 shadow" type="file"/>
-                    <label asp-for="CVUrl" class="ms-2"></label>
+                    <input asp-for="CV" class="form-control border-0 shadow" type="file" />
+                    <label asp-for="CV" class="ms-2"></label>
                 </div>
                 
 

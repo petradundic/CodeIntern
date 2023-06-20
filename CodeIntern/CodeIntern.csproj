@@ -24,4 +24,8 @@
     <ProjectReference Include="..\CodeIntern.Utility\CodeIntern.Utility.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Objects\" />
+  </ItemGroup>
+
 </Project>
