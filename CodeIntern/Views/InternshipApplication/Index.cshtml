@@ -13,7 +13,7 @@
             <div class="col-6">
             </div>
         </div>
-
+        
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
@@ -48,7 +48,9 @@
                         </td>
                         <td>
                             <div class="w-75 btn-group" role="group">
-
+                                <a asp-controller="InternshipApplication" asp-action="ViewPdf" asp-route-id="@obj.InternshipApplicationId" class="btn btn-primary mx-2">
+                                    <i class="bi bi-trash-fill"></i> CV Preview
+                                </a>
                                 <a asp-controller="Internship" asp-action="Details" asp-route-id="@obj.InternshipId" class="btn btn-primary mx-2">
                                     <i class="bi bi-trash-fill"></i> Back to internship
                                 </a>
@@ -62,3 +64,4 @@
 
     </div>
 </div>
+

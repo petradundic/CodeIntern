@@ -28,9 +28,15 @@
                     <input asp-for="Country" class="form-control border-0 shadow" />
                     <label asp-for="Country" class="ms-2"></label>
                 </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="City" class="form-control border-0 shadow" />
-                    <label asp-for="City" class="ms-2"></label>
+                <div class="form-floating mb-3">
+                    <select asp-for="City" class="form-select">
+                        <option disabled selected>-Select Location-</option>
+                        @foreach (var city in SD.Cities)
+                        {
+                            <option value="@city">@city</option>
+                        }
+                    </select>
+
                 </div>
                 <div class="form-floating py-2 col-12">
                     <input asp-for="Address" class="form-control border-0 shadow" />

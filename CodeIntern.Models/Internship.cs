@@ -46,7 +46,13 @@ namespace CodeIntern.Models
         [Required]
         public DateTime CreatedDate { get; set; }
 
-        public int NumOfApplications { get; set; }  
+        public int NumOfApplications { get; set; }
+        
+        public string? Position { get; set; }
+
+        public string? ProgLanguage { get; set; }
+        public string? Technology { get; set; }
+        public string? WorkPlace { get; set;}
 
     }
 }
