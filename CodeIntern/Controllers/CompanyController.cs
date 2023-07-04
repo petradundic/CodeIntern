@@ -13,8 +13,12 @@ namespace CodeIntern.Controllers
         {
             _companyRepo = db;
         }
-        public IActionResult Index()
+        public IActionResult Index(List<Company>? obj)
         {
+            if (obj != null && obj.Count > 0)
+            {
+                return View(obj);
+            }
 
             List<Company> companiesList = _companyRepo.GetAll(x => x.RegistrationRequest == false).ToList();
 
@@ -101,6 +105,21 @@ namespace CodeIntern.Controllers
             _companyRepo.Save();
             TempData["success"] = "Company deleted successfully";
             return RedirectToAction("Index");
+        }
+
+        public IActionResult Filter(string? location)
+        {
+            List<Company> companies = _companyRepo.GetAll().ToList();
+
+            
+            if (!string.IsNullOrEmpty(location) && location != "-")
+            {
+                companies = companies.Where(x => x.City == location).ToList();
+            }
+
+            
+
+            return View("Index", companies);
         }
     }
 }

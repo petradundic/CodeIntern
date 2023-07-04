@@ -93,52 +93,24 @@ namespace CodeIntern.Controllers
 
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Create(InternshipApplication obj, int InternshipId)
-        //{
-        //    //if (cvFile != null && cvFile.Length > 0)
-        //    //{
-        //    //    using (var memoryStream = new MemoryStream())
-        //    //    {
-        //    //        await cvFile.CopyToAsync(memoryStream);
-        //    //        obj.CV = memoryStream.ToArray();
-        //    //    }
-        //    //}
-
-        //    Internship internship = _internshipRepository.Get(x => x.InternshipId == InternshipId);
-        //    var userId = _userManager.GetUserId(User);
-
-        //    obj.InternshipId = InternshipId;
-        //    obj.StudentId = userId;
-        //    obj.DateCreated = DateTime.Now;
-        //    obj.Status = "Applied";
-
-        //    _internApplicationRepo.Add(obj);
-        //    _internApplicationRepo.Save();
-        //    internship.NumOfApplications += 1;
-        //    _internshipRepository.Update(internship);
-        //    _internshipRepository.Save();
-
-        //    return RedirectToAction("Index");
-        //}
 
 
-        //public IActionResult Edit(int? id)
-        //{
-        //    if (id == null || id == 0)
-        //    {
-        //        return NotFound();
-        //    }
-        //    // InternshipApplication?  InternshipApplicationFromDb = _unitOfWork. InternshipApplication.Get(u => u.Id == id);
-        //     InternshipApplication?  InternshipApplicationFromDb1 =  _internApplicationRepo.Get(u => u. InternshipApplicationId == id);
-        //    // InternshipApplication?  InternshipApplicationFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
+        public IActionResult Edit(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            // InternshipApplication?  InternshipApplicationFromDb = _unitOfWork. InternshipApplication.Get(u => u.Id == id);
+            InternshipApplication? InternshipApplicationFromDb1 = _internApplicationRepo.Get(u => u.InternshipApplicationId == id);
+            // InternshipApplication?  InternshipApplicationFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
 
-        //    if (InternshipApplicationFromDb1 == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(InternshipApplicationFromDb1);
-        //}
+            if (InternshipApplicationFromDb1 == null)
+            {
+                return NotFound();
+            }
+            return View(InternshipApplicationFromDb1);
+        }
         [HttpPost]
         public IActionResult Edit( InternshipApplication obj)
         {
@@ -152,32 +124,32 @@ namespace CodeIntern.Controllers
 
         }
 
-        //public IActionResult Delete(int? id)
-        //{
-        //    if (id == null || id == 0)
-        //    {
-        //        return NotFound();
-        //    }
-        //     InternshipApplication?  InternshipApplicationFromDb =  _internApplicationRepo.Get(x => x. InternshipApplicationId == id);
+        public IActionResult Delete(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            InternshipApplication? InternshipApplicationFromDb = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
 
-        //    if ( InternshipApplicationFromDb == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View( InternshipApplicationFromDb);
-        //}
-        //[HttpPost, ActionName("Delete")]
-        //public IActionResult DeletePOST(int? id)
-        //{
-        //    InternshipApplication? obj = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
-        //    if (obj == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    _internApplicationRepo.Remove(obj);
-        //    _internApplicationRepo.Save();
-        //    TempData["success"] = " InternshipApplication deleted successfully";
-        //    return RedirectToAction("Index");
-        //}
+            if (InternshipApplicationFromDb == null)
+            {
+                return NotFound();
+            }
+            return View(InternshipApplicationFromDb);
+        }
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeletePOST(int? id)
+        {
+            InternshipApplication? obj = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+            _internApplicationRepo.Remove(obj);
+            _internApplicationRepo.Save();
+            TempData["success"] = " InternshipApplication deleted successfully";
+            return RedirectToAction("Index");
+        }
     }
 }

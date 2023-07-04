@@ -19,7 +19,22 @@
                         <i class="bi bi-plus-circle"></i> Create New Company </a>}
             </div>*@
         </div>
-
+        <div class="mb-3">
+            <button id="filterButton" class="btn btn-primary" type="button">Filter</button>
+            <div id="filterOptions" class="mt-3" style="display: none;">
+                
+                <div class="form-group">
+                    <label for="locationFilter">Location:</label>
+                    <select id="locationFilter" class="form-select">
+                        <option>-</option>
+                        @foreach (var city in SD.Cities)
+                        {
+                            <option value="@city">@city</option>
+                        }
+                    </select>
+                </div>
+                <button id="applyFilterButton" class="btn btn-primary" type="button">Apply Filter</button>
+            </div>
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
@@ -69,3 +84,21 @@
 
     </div>
 </div>
+    <script>
+        document.getElementById("filterButton").addEventListener("click", function () {
+            var filterOptions = document.getElementById("filterOptions");
+            if (filterOptions.style.display === "none") {
+                filterOptions.style.display = "block";
+            } else {
+                filterOptions.style.display = "none";
+            }
+        });
+
+        document.getElementById("applyFilterButton").addEventListener("click", function () {
+            var locationFilter = document.getElementById("locationFilter");
+            var locationValue = locationFilter ? locationFilter.value : "";
+
+            window.location.href = '/Company/Filter?location=' + locationValue;
+
+        });
+    </script>

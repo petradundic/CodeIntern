@@ -30,6 +30,7 @@
                 <div class="form-group">
                     <label for="locationFilter">Location:</label>
                     <select id="locationFilter" class="form-select">
+                        <option>-</option>
                         @foreach (var city in SD.Cities)
                         {
                             <option value="@city">@city</option>
@@ -39,6 +40,7 @@
                 <div class="form-group">
                     <label for="positionFilter">Position:</label>
                     <select id="positionFilter" class="form-select">
+                        <option>-</option>
                         @foreach (var position in SD.Position)
                         {
                             <option value="@position">@position</option>
@@ -48,6 +50,7 @@
                 <div class="form-group">
                     <label for="prLanguageFilter">Prog. language:</label>
                     <select id="prLanguageFilter" class="form-select">
+                        <option>-</option>
                         @foreach (var prLanguage in SD.ProgLanguage)
                         {
                             <option value="@prLanguage">@prLanguage</option>
@@ -57,6 +60,7 @@
                 <div class="form-group">
                     <label for="techFilter">Technology:</label>
                     <select id="techFilter" class="form-select">
+                        <option>-</option>
                         @foreach (var tech in SD.Technology)
                         {
                             <option value="@tech">@tech</option>
@@ -66,6 +70,7 @@
                 <div class="form-group">
                     <label for="workPlaceFilter">Workplace:</label>
                     <select id="workPlaceFilter" class="form-select">
+                        <option>-</option>
                         @foreach (var workPlace in SD.WorkPlace)
                         {
                             <option value="@workPlace">@workPlace</option>

@@ -20,8 +20,13 @@ namespace CodeIntern.Controllers
             _savedInternRepo = savedInternRepo;
             _internshipRepo = internshipRepository;
         }
-        public IActionResult Index(string? companyId)
+        public IActionResult Index(string? companyId, List<Internship>? obj )
         {
+            if(obj != null && obj.Count > 0)
+            {
+                return View(obj);
+            }
+
             List<Internship> InternshipsList = _internshipRepo.GetAll().ToList();
             return View(InternshipsList);
         }
@@ -32,6 +37,8 @@ namespace CodeIntern.Controllers
             Internship? InternshipFromDb = _internshipRepo.Get(x => x.InternshipId == id);
             return View(InternshipFromDb);
         }
+
+        
         public IActionResult SaveInternship(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -135,32 +142,32 @@ namespace CodeIntern.Controllers
                 internships = _internshipRepo.GetAll().ToList();
             }
 
-            if (!string.IsNullOrEmpty(location))
+            if (!string.IsNullOrEmpty(location) && location!="-")
             {
                 internships = internships.Where(x => x.Location == location).ToList();
             }
 
-            if (!string.IsNullOrEmpty(position))
+            if (!string.IsNullOrEmpty(position) && position != "-")
             {
                 internships = internships.Where(x => x.Position == position).ToList();
             }
 
-            if (!string.IsNullOrEmpty(technology))
+            if (!string.IsNullOrEmpty(technology) && technology != "-")
             {
                 internships = internships.Where(x => x.Technology == technology).ToList();
             }
 
-            if (!string.IsNullOrEmpty(language))
+            if (!string.IsNullOrEmpty(language) && language != "-")
             {
                 internships = internships.Where(x => x.ProgLanguage == language).ToList();
             }
 
-            if (!string.IsNullOrEmpty(workPlace))
+            if (!string.IsNullOrEmpty(workPlace) && workPlace != "-")
             {
                 internships = internships.Where(x => x.WorkPlace == workPlace).ToList();
             }
 
-            return RedirectToAction("Index",  internships );
+            return View("Index",internships);
         }
 
        
