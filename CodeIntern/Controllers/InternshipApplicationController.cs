@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.IO;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace CodeIntern.Controllers
 {
@@ -15,13 +16,15 @@ namespace CodeIntern.Controllers
     {
         public readonly IInternApplicationRepository _internApplicationRepo;
         public readonly IInternshipRepository _internshipRepository;
+        public readonly INotificationRepository _notificationRepository;
         public readonly UserManager<IdentityUser> _userManager;
 
-        public InternshipApplicationController(IInternApplicationRepository db, IInternshipRepository internshipRepository, UserManager<IdentityUser> userManager)
+        public InternshipApplicationController(IInternApplicationRepository db, IInternshipRepository internshipRepository, UserManager<IdentityUser> userManager, INotificationRepository notificationRepository)
         {
             _internApplicationRepo = db;
             _internshipRepository = internshipRepository;
             _userManager = userManager;
+            _notificationRepository = notificationRepository;   
         }
         public IActionResult Index(int? internshipId)
         {
@@ -95,33 +98,81 @@ namespace CodeIntern.Controllers
 
 
 
-        public IActionResult Edit(int? id)
+        public IActionResult Edit(int id)
         {
-            if (id == null || id == 0)
+            InternshipApplication internshipApplication = _internApplicationRepo.Get(u => u.InternshipApplicationId == id);
+            if (internshipApplication == null)
             {
                 return NotFound();
             }
-            // InternshipApplication?  InternshipApplicationFromDb = _unitOfWork. InternshipApplication.Get(u => u.Id == id);
-            InternshipApplication? InternshipApplicationFromDb1 = _internApplicationRepo.Get(u => u.InternshipApplicationId == id);
-            // InternshipApplication?  InternshipApplicationFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
 
-            if (InternshipApplicationFromDb1 == null)
+            var editViewModel = new EditViewModel
             {
-                return NotFound();
-            }
-            return View(InternshipApplicationFromDb1);
+                InternshipApplicationId = internshipApplication.InternshipApplicationId,
+                FirstName = internshipApplication.FirstName,
+                LastName = internshipApplication.LastName,
+                Email = internshipApplication.Email,
+                CvFile = null,
+                SelectedStatus = internshipApplication.Status
+            };
+
+            return View(editViewModel);
         }
         [HttpPost]
-        public IActionResult Edit( InternshipApplication obj)
+        public IActionResult Edit(EditViewModel model)
         {
             if (ModelState.IsValid)
             {
-                 _internApplicationRepo.Update(obj);
-                 _internApplicationRepo.Save();
+                InternshipApplication internshipApplication = _internApplicationRepo.Get(u => u.InternshipApplicationId == model.InternshipApplicationId);
+                if (internshipApplication == null)
+                {
+                    return NotFound();
+                }
+                internshipApplication.FirstName = model.FirstName;
+                internshipApplication.LastName = model.LastName;
+                internshipApplication.Email = model.Email;
+
+                byte[] cvBytes = null;
+                if (model.CvFile != null)
+                {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            model.CvFile.CopyTo(memoryStream);
+                            cvBytes = memoryStream.ToArray();
+                        }
+
+                    internshipApplication.CV=cvBytes;
+                }
+
+                if (model.SelectedStatus != internshipApplication.Status)
+                {
+                    //ubaci logiku za notifikacije
+                    internshipApplication.Status = model.SelectedStatus;
+                    Internship internship = _internshipRepository.Get(x => x.InternshipId == internshipApplication.InternshipId);
+                    string companyId = internship.CompanyId;
+                    string studentId = internshipApplication.StudentId;
+
+
+                    Notification notification=new Notification();
+                    notification.InternshipApplicationId=internshipApplication.InternshipApplicationId;
+                    notification.FromUser = _userManager.GetUserId(User);
+                    notification.ToUser=studentId;
+                    notification.Text = $"Your application status has been changed to {model.SelectedStatus}.";
+                    notification.DateCreated=DateTime.Now;
+                    notification.IsRead = false;
+
+                    _notificationRepository.Add(notification);
+                    _notificationRepository.Save();
+
+                }
+
+                _internApplicationRepo.Update(internshipApplication);
+                _internApplicationRepo.Save();
+
                 return RedirectToAction("Index");
             }
-            return View();
 
+            return View(model);
         }
 
         public IActionResult Delete(int? id)

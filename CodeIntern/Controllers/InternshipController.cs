@@ -98,7 +98,7 @@ namespace CodeIntern.Controllers
                 return RedirectToAction("Index");
             }
             return View();
-
+             
         }
 
         public IActionResult Delete(int? id)
@@ -125,7 +125,6 @@ namespace CodeIntern.Controllers
             }
             _internshipRepo.Remove(obj);
             _internshipRepo.Save();
-            TempData["success"] = "Internship deleted successfully";
             return RedirectToAction("Index");
         }
 
@@ -170,6 +169,20 @@ namespace CodeIntern.Controllers
             return View("Index",internships);
         }
 
-       
+        public IActionResult Search(string searchTerm)
+        {
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                List<Internship> results = _internshipRepo.GetAll(x => x.Title.Contains(searchTerm) || x.CompanyName == searchTerm || x.Description.Contains(searchTerm)).ToList();
+                if (results.Count > 0)
+                {
+                    return View("Index", results);
+                }
+            }
+
+            return View("Index");
+        }
+
+
     }
 }

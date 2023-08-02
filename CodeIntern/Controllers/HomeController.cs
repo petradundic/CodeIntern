@@ -1,6 +1,8 @@
 ﻿using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
 
 namespace CodeIntern.Controllers
@@ -8,12 +10,15 @@ namespace CodeIntern.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        public readonly IInternshipRepository _internshipRepository;
-
-        public HomeController(ILogger<HomeController> logger, IInternshipRepository internshipRepository)
+        private readonly IInternshipRepository _internshipRepository;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly UserManager<IdentityUser> _userManager;
+        public HomeController(ILogger<HomeController> logger, IInternshipRepository internshipRepository, INotificationRepository notificationRepository, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
             _internshipRepository = internshipRepository;
+            _notificationRepository = notificationRepository;
+            _userManager = userManager;
         }
 
         public IActionResult Register()
@@ -22,6 +27,13 @@ namespace CodeIntern.Controllers
         }
         public IActionResult Index()
         {
+            if(!_userManager.GetUserId(User).IsNullOrEmpty()) 
+            {
+                List<Notification> notificationList = _notificationRepository.GetAll(x => x.ToUser == _userManager.GetUserId(User)).ToList();
+                ViewBag.Notifications = notificationList;
+            }
+            
+
             return View();
         }
 

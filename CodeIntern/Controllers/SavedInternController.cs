@@ -37,6 +37,9 @@ namespace CodeIntern.Controllers
             return View(internships);
         }
 
+
+      
+        
         [HttpPost]
         public IActionResult Delete(int? id) 
         {
@@ -47,7 +50,6 @@ namespace CodeIntern.Controllers
             }
             _savedInternRepo.Remove(obj);
             _savedInternRepo.Save();
-            //TempData["success"] = "Internship deleted successfully";
             return RedirectToAction("Index");
 
 
