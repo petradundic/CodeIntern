@@ -8,7 +8,7 @@ namespace CodeIntern.Controllers
 {
     public class SavedInternController : Controller
     {
-        public readonly IInternshipRepository _internshipRepository;
+        private readonly IInternshipRepository _internshipRepository;
         private readonly ISavedInternRepository _savedInternRepo;
         private readonly UserManager<IdentityUser> _userManager;
         public SavedInternController(ISavedInternRepository db, UserManager<IdentityUser> userManager, IInternshipRepository internshipRepository)
@@ -37,22 +37,19 @@ namespace CodeIntern.Controllers
             return View(internships);
         }
 
-
-      
-        
-        [HttpPost]
-        public IActionResult Delete(int? id) 
+        public async Task<IActionResult> Delete(int? id)
         {
-            SavedInternship? obj = _savedInternRepo.Get(x => x.InternshipId == id); ;
+            SavedInternship? obj = await _savedInternRepo.GetAsync(x => x.InternshipId == id);
+
             if (obj == null)
             {
                 return NotFound();
             }
+
             _savedInternRepo.Remove(obj);
-            _savedInternRepo.Save();
+            await _savedInternRepo.SaveAsync();
+
             return RedirectToAction("Index");
-
-
         }
 
     }

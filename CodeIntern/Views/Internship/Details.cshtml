@@ -26,13 +26,28 @@
 
     <div>
         <div class="row pt-2">
-             @if (User.IsInRole(SD.Role_Student)){
-            <div class="col-6 col-md-3">
-                    <a asp-controller="InternshipApplication" asp-action="Create" asp-route-internshipId="@Model.InternshipId"  class="btn btn-outline-primary border  form-control">
-                    Apply for internship
-                </a>
-            </div>
+            @if (User.IsInRole(SD.Role_Student))
+            {
+                @if (!ViewBag.HasApplied)
+                {
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="InternshipApplication" asp-action="Create" asp-route-internshipId="@Model.InternshipId" class="btn btn-outline-primary border form-control">
+                            Apply for internship
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-6 col-md-3">
+                    <form method="post" asp-controller="InternshipApplication" asp-action="Delete" asp-route-id="@ViewBag.InternshipApplicationId">
+                        <button type="submit" class="btn btn-danger mx-2">
+                            <i class="bi bi-trash-fill"></i> Cancel application
+                        </button>
+                    </form>
+                    </div>
+                }
             }
+
             @if (!User.IsInRole(SD.Role_Student) && Model.NumOfApplications != 0 && Model.CompanyId==ViewBag.UserId)
             {
                 <div class="col-6 col-md-3">

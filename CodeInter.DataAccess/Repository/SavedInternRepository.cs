@@ -1,9 +1,11 @@
 ﻿using CodeIntern.DataAccess.Data;
 using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +22,23 @@ namespace CodeIntern.DataAccess.Repository
         public void Save()
         {
             _db.SaveChanges();
+        }
+
+        public async Task<SavedInternship> GetAsync(Expression<Func<SavedInternship, bool>> predicate)
+        {
+            return await _db.SavedInternship.FirstOrDefaultAsync(predicate);
+
+        }
+
+        public async Task RemoveAsync(SavedInternship entity)
+        {
+            _db.SavedInternship.Remove(entity);
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task SaveAsync()
+        {
+            await _db.SaveChangesAsync();
         }
     }
 }

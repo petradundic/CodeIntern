@@ -14,10 +14,10 @@ namespace CodeIntern.Controllers
 {
     public class InternshipApplicationController : Controller
     {
-        public readonly IInternApplicationRepository _internApplicationRepo;
-        public readonly IInternshipRepository _internshipRepository;
-        public readonly INotificationRepository _notificationRepository;
-        public readonly UserManager<IdentityUser> _userManager;
+        private readonly IInternApplicationRepository _internApplicationRepo;
+        private readonly IInternshipRepository _internshipRepository;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly UserManager<IdentityUser> _userManager;
 
         public InternshipApplicationController(IInternApplicationRepository db, IInternshipRepository internshipRepository, UserManager<IdentityUser> userManager, INotificationRepository notificationRepository)
         {
@@ -175,31 +175,46 @@ namespace CodeIntern.Controllers
             return View(model);
         }
 
-        public IActionResult Delete(int? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-            InternshipApplication? InternshipApplicationFromDb = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
+        //public IActionResult Delete(int? id)
+        //{
+        //    if (id == null || id == 0)
+        //    {
+        //        return NotFound();
+        //    }
+        //    InternshipApplication? InternshipApplicationFromDb = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
 
-            if (InternshipApplicationFromDb == null)
-            {
-                return NotFound();
-            }
-            return View(InternshipApplicationFromDb);
-        }
-        [HttpPost, ActionName("Delete")]
-        public IActionResult DeletePOST(int? id)
+        //    if (InternshipApplicationFromDb == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(InternshipApplicationFromDb);
+        //}
+        //[HttpPost, ActionName("Delete")]
+        //public IActionResult DeletePOST(int? id)
+        //{
+        //    InternshipApplication? obj = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
+        //    if (obj == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    _internApplicationRepo.Remove(obj);
+        //    _internApplicationRepo.Save();
+        //    TempData["success"] = " InternshipApplication deleted successfully";
+        //    return RedirectToAction("Index");
+        //}
+
+        public async Task<IActionResult> Delete(int? id)
         {
-            InternshipApplication? obj = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
+            InternshipApplication? obj = await _internApplicationRepo.GetAsync(x => x.InternshipApplicationId == id);
+
             if (obj == null)
             {
                 return NotFound();
             }
+
             _internApplicationRepo.Remove(obj);
-            _internApplicationRepo.Save();
-            TempData["success"] = " InternshipApplication deleted successfully";
+            await _internApplicationRepo.SaveAsync();
+
             return RedirectToAction("Index");
         }
     }

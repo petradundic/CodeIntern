@@ -11,14 +11,16 @@ namespace CodeIntern.Controllers
 {
     public class InternshipController : Controller
     {
-        IInternshipRepository _internshipRepo;
+        private readonly IInternshipRepository _internshipRepo;
         private readonly ISavedInternRepository _savedInternRepo;
+        private readonly IInternApplicationRepository _internApplicationRepo;
         private readonly UserManager<IdentityUser> _userManager;
-        public InternshipController(UserManager<IdentityUser> userManager, ISavedInternRepository savedInternRepo, IInternshipRepository internshipRepository)
+        public InternshipController(UserManager<IdentityUser> userManager, ISavedInternRepository savedInternRepo, IInternshipRepository internshipRepository, IInternApplicationRepository internApplicationRepo)
         {
             _userManager = userManager;
             _savedInternRepo = savedInternRepo;
             _internshipRepo = internshipRepository;
+            _internApplicationRepo = internApplicationRepo; 
         }
         public IActionResult Index(string? companyId, List<Internship>? obj )
         {
@@ -34,6 +36,18 @@ namespace CodeIntern.Controllers
         {
             var userId = _userManager.GetUserId(User);
             ViewBag.UserId = userId;
+
+            InternshipApplication? internApp= _internApplicationRepo.Get(x=>x.InternshipId==id && x.StudentId==userId);
+            if (internApp != null)
+            {
+                ViewBag.HasApplied = true;
+                ViewBag.InternshipApplicationId = internApp.InternshipApplicationId;
+            }
+            else
+            {
+                ViewBag.HasApplied = false;
+            }
+
             Internship? InternshipFromDb = _internshipRepo.Get(x => x.InternshipId == id);
             return View(InternshipFromDb);
         }
@@ -78,9 +92,7 @@ namespace CodeIntern.Controllers
             {
                 return NotFound();
             }
-            //Internship? InternshipFromDb = _unitOfWork.Internship.Get(u => u.Id == id);
             Internship? InternshipFromDb1 = _internshipRepo.Get(x => x.InternshipId == id); ;
-            //Internship? InternshipFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
 
             if (InternshipFromDb1 == null)
             {
