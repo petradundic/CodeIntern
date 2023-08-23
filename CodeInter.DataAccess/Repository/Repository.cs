@@ -1,4 +1,5 @@
 ﻿using CodeIntern.DataAccess.Data;
+using CodeIntern.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Linq.Expressions;
@@ -48,5 +49,12 @@ namespace CodeIntern.DataAccess.Repository
         { 
             dbSet.RemoveRange(entity);
         }
+
+        public async Task RemoveRangeAsync(IEnumerable<T> entities)
+        {
+            dbSet.RemoveRange(entities);
+            await _db.SaveChangesAsync();
+        }
+
     }
 }

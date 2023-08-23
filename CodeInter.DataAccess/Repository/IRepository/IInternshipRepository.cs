@@ -11,5 +11,6 @@ namespace CodeIntern.DataAccess.Repository.IRepository
     {
         void Update(Internship obj);
         void Save();
+
     }
 }

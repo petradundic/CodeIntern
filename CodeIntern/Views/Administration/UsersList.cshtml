@@ -1,0 +1,38 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model List<IdentityUser>
+
+<h2>Users:</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr data-user-id="@user.Id" class="user-row">
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>
+                    <button class="btn btn-primary edit-button">Edit</button>
+                    
+                    <form method="post" asp-controller="Administration" asp-action="DeleteUser" asp-route-id="@user.Id">
+                      <button type="submit" class="btn btn-danger mx-2">
+                            <i class="bi bi-trash-fill"></i> Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div id="edit-delete-buttons" style="display: none;">
+    <a href="#" class="btn btn-primary" id="edit-link">Edit</a>
+    <a href="#" class="btn btn-danger" id="delete-link">Delete</a>
+</div>
+

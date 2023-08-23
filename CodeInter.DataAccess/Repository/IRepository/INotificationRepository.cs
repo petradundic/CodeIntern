@@ -11,5 +11,6 @@ namespace CodeIntern.DataAccess.Repository.IRepository
     {
         void Update(Notification obj);
         void Save();
+        Task RemoveRangeAsync(List<Notification> entities);
     }
 }

@@ -16,6 +16,8 @@ namespace CodeIntern.DataAccess.Repository.IRepository
         Task RemoveAsync(InternshipApplication entity);
         Task SaveAsync();
 
+        Task RemoveRangeAsync(List<InternshipApplication> entities);
+
 
     }
 }

@@ -14,5 +14,7 @@ namespace CodeIntern.DataAccess.Repository.IRepository
         Task<SavedInternship?> GetAsync(Expression<Func<SavedInternship, bool>> predicate);
         Task RemoveAsync(SavedInternship entity);
         Task SaveAsync();
+        Task RemoveRangeAsync(List<SavedInternship> entities);
+
     }
 }

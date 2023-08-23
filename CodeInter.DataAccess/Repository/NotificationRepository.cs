@@ -17,6 +17,12 @@ namespace CodeIntern.DataAccess.Repository
             _db = db;
         }
 
+        public async Task RemoveRangeAsync(List<Notification> entities)
+        {
+            _db.Notification.RemoveRange(entities);
+            await _db.SaveChangesAsync();
+        }
+
         public void Save()
         {
             _db.SaveChanges();

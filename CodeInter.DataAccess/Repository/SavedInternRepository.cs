@@ -40,5 +40,11 @@ namespace CodeIntern.DataAccess.Repository
         {
             await _db.SaveChangesAsync();
         }
+
+        public async Task RemoveRangeAsync(List<SavedInternship> entities)
+        {
+            _db.SavedInternship.RemoveRange(entities);
+            await _db.SaveChangesAsync();
+        }
     }
 }
