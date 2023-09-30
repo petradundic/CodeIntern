@@ -12,6 +12,8 @@ namespace CodeIntern.Controllers
 
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+
         private ICompanyRepository _companyRepository;
         private IInternApplicationRepository _internApplicationRepository;
         private IInternshipRepository _internshipRepository;
@@ -20,7 +22,7 @@ namespace CodeIntern.Controllers
 
 
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IInternApplicationRepository internApplicationRepository, IInternshipRepository internshipRepository, ISavedInternRepository savedInternRepository,ICompanyRepository companyRepository, INotificationRepository notificationRepository)
+        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IInternApplicationRepository internApplicationRepository, IInternshipRepository internshipRepository, ISavedInternRepository savedInternRepository,ICompanyRepository companyRepository, INotificationRepository notificationRepository,SignInManager<IdentityUser> signInManager)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -29,6 +31,7 @@ namespace CodeIntern.Controllers
             _savedInternRepository = savedInternRepository;
             _companyRepository = companyRepository;
             _notificationRepository = notificationRepository;   
+            _signInManager = signInManager;
         }
 
         public async Task<IActionResult> DeleteUser(string id)
@@ -136,6 +139,138 @@ namespace CodeIntern.Controllers
             }
          }
 
+        public IActionResult ResetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel resetData)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (ModelState.IsValid)
+            {
+                if (resetData.OldPassword != null) 
+                {
+                    if(userId!=null)
+                    { 
+                    var user = await _userManager.FindByIdAsync(userId);
+                    if (user == null)
+                    {
+                         return NotFound();
+                     }
+
+                    else
+                    {
+
+                        bool isOldPassCorrect = await _userManager.CheckPasswordAsync(user, resetData.OldPassword);
+                    if (isOldPassCorrect) {
+                                    if (!string.IsNullOrEmpty(resetData.NewPassword))
+                                    {
+                                        var newPasswordHash = _userManager.PasswordHasher.HashPassword(user, resetData.NewPassword);
+                                        user.PasswordHash = newPasswordHash;
+                                    }
+
+                                    // Save changes to the user
+                                    var result = await _userManager.UpdateAsync(user);
+
+                                    if (result.Succeeded)
+                                    {
+                                        // Optionally, sign the user out and back in to refresh the authentication cookie
+                                        await _signInManager.SignOutAsync();
+                                        await _signInManager.SignInAsync(user, isPersistent: false);
+
+                                        return RedirectToAction("Index", "Home"); // Redirect to a success page
+                                    }
+
+                                    // Handle errors here if the update fails
+                                    foreach (var error in result.Errors)
+                                    {
+                                        ModelState.AddModelError(string.Empty, error.Description);
+                                    }
+                                }
+                    }
+                    }
+                }
+
+            }
+            
+
+            return View();
+        }
+
+
+
+        //    public async Task<IActionResult> UpdateUser(string id)
+        //{
+        //    // Find the user by their ID
+        //    var user = await _userManager.FindByIdAsync(id);
+
+        //    if (user == null)
+        //    {
+        //        // User not found
+        //        return NotFound();
+        //    }
+
+        //    // Optionally, you can load the user's associated claims and roles here
+        //    // var userClaims = await _userManager.GetClaimsAsync(user);
+        //    // var userRoles = await _userManager.GetRolesAsync(user);
+
+        //    return View(user); // Pass the user to the view for editing
+        //}
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> UpdateUser(string id, IdentityUser updatedUser, string password)
+        //{
+        //    if (id != updatedUser.Id)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        var user = await _userManager.FindByIdAsync(id);
+
+        //        if (user == null)
+        //        {
+        //            return NotFound();
+        //        }
+
+        //        // Update user properties
+        //        user.Email = updatedUser.Email;
+        //        user.UserName = updatedUser.Email; // Assuming username is the same as email
+        //                                           // You can add more updates here as needed
+
+        //        // Update the user's password if it's provided
+        //        if (!string.IsNullOrEmpty(password))
+        //        {
+        //            var newPasswordHash = _userManager.PasswordHasher.HashPassword(user, password);
+        //            user.PasswordHash = newPasswordHash;
+        //        }
+
+        //        // Save changes to the user
+        //        var result = await _userManager.UpdateAsync(user);
+
+        //        if (result.Succeeded)
+        //        {
+        //            // Optionally, sign the user out and back in to refresh the authentication cookie
+        //            await _signInManager.SignOutAsync();
+        //            await _signInManager.SignInAsync(user, isPersistent: false);
+
+        //            return RedirectToAction("Index", "Home"); // Redirect to a success page
+        //        }
+
+        //        // Handle errors here if the update fails
+        //        foreach (var error in result.Errors)
+        //        {
+        //            ModelState.AddModelError(string.Empty, error.Description);
+        //        }
+        //    }
+
+        //    // If ModelState is not valid, return to the edit view with validation errors
+        //    return View(updatedUser);
+        //}
 
         public IActionResult Index()
         {

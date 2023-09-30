@@ -32,6 +32,18 @@ namespace CodeIntern.Controllers
             List<Internship> InternshipsList = _internshipRepo.GetAll().ToList();
             return View(InternshipsList);
         }
+
+        public IActionResult ExpiredInternships()
+        {
+
+            List<Internship> InternshipsList = _internshipRepo.GetAll(x=>x.StartDate < DateTime.Now).ToList();
+            if (InternshipsList != null && InternshipsList.Count > 0)
+            {
+                return View("Index", InternshipsList);
+            }
+            //dodaj neku poruku
+            return View("Index");
+        }
         public IActionResult Details(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -77,6 +89,7 @@ namespace CodeIntern.Controllers
         [HttpPost]
         public IActionResult Create(Internship obj)
         {
+            //dodaj uvjet i validaciju za start date da ne bude ranije od kreiranog i da bude 7 dana od kreiranja
             var userId = _userManager.GetUserId(User);
             obj.CompanyId = userId;
             obj.CreatedDate = DateTime.Now;
