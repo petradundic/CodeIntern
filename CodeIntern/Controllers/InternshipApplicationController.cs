@@ -26,12 +26,16 @@ namespace CodeIntern.Controllers
             _userManager = userManager;
             _notificationRepository = notificationRepository;   
         }
-        public IActionResult Index(int? internshipId)
+        public IActionResult Index(int? internshipId, string? studentId)
         {
             List<InternshipApplication> applications = null;
             if(internshipId != null)
             {
                 applications = _internApplicationRepo.GetAll(x=>x.InternshipId==internshipId).ToList();
+            }
+            else if(!String.IsNullOrEmpty(studentId))
+            {
+                applications = _internApplicationRepo.GetAll(x => x.StudentId == studentId).ToList();
             }
             else
             {
@@ -78,6 +82,7 @@ namespace CodeIntern.Controllers
             obj.Email = temp.Email;
             obj.CV = cvBytes;
             obj.Status = "Applied";
+            obj.InternshipTitle=internship.Title;
 
             _internApplicationRepo.Add(obj);
             _internApplicationRepo.Save();

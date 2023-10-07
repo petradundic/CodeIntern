@@ -1,7 +1,9 @@
 ﻿using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
 using CodeIntern.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +15,7 @@ namespace CodeIntern.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IEmailSender _emailSender; 
 
         private ICompanyRepository _companyRepository;
         private IInternApplicationRepository _internApplicationRepository;
@@ -22,7 +25,7 @@ namespace CodeIntern.Controllers
 
 
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IInternApplicationRepository internApplicationRepository, IInternshipRepository internshipRepository, ISavedInternRepository savedInternRepository,ICompanyRepository companyRepository, INotificationRepository notificationRepository,SignInManager<IdentityUser> signInManager)
+        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IInternApplicationRepository internApplicationRepository, IInternshipRepository internshipRepository, ISavedInternRepository savedInternRepository,ICompanyRepository companyRepository, INotificationRepository notificationRepository,SignInManager<IdentityUser> signInManager, IEmailSender emailSender)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -32,6 +35,7 @@ namespace CodeIntern.Controllers
             _companyRepository = companyRepository;
             _notificationRepository = notificationRepository;   
             _signInManager = signInManager;
+            _emailSender = emailSender;
         }
 
         public async Task<IActionResult> DeleteUser(string id)
@@ -198,6 +202,46 @@ namespace CodeIntern.Controllers
 
             return View();
         }
+
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                {
+                    // Don't reveal that the user does not exist or is not confirmed
+                    return RedirectToAction(nameof(ForgotPasswordConfirmation));
+                }
+
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var callbackUrl = Url.Action("ResetPassword", "Administration", new { userId = user.Id, code = code }, protocol: Request.Scheme);
+                await _emailSender.SendEmailAsync(model.Email, "Reset Password",
+                    $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
+                return RedirectToAction(nameof(ForgotPasswordConfirmation));
+            }
+
+            // If we got this far, something failed; redisplay the form.
+            return View(model);
+        }
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }
+
 
 
 

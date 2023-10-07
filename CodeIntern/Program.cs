@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.DataAccess.Repository;
 using CodeIntern.Models;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 

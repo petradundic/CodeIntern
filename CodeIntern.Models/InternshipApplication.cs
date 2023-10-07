@@ -29,6 +29,8 @@ namespace CodeIntern.Models
         public DateTime? DateCreated { get; set; }
         public string? Status { get; set; }
 
+        public string? InternshipTitle { get; set;}
+
 
         
     }
