@@ -54,7 +54,7 @@ namespace CodeIntern.Controllers
             notification.IsRead = true;
             _notificationRepository.Update(notification);
             _notificationRepository.Save();
-             
+              
             return View(internshipApplicationFromDb);
         }
 
