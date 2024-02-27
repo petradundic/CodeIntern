@@ -2,16 +2,20 @@
 using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
 using CodeIntern.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace CodeIntern.Controllers
 {
     public class CompanyController : Controller
     {
         private readonly ICompanyRepository _companyRepo;
-        public CompanyController(ICompanyRepository db) 
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public CompanyController(ICompanyRepository db, IWebHostEnvironment webHostEnvironment)
         {
             _companyRepo = db;
+            _webHostEnvironment = webHostEnvironment;
         }
         public IActionResult Index(List<Company>? obj)
         {
@@ -27,25 +31,42 @@ namespace CodeIntern.Controllers
                 companiesList = _companyRepo.GetAll().ToList();
             }
 
-                return View(companiesList);
+            return View(companiesList);
         }
         public IActionResult Details(int id)
         {
-            Company? CompanyFromDb = _companyRepo.Get(x=>x.CompanyId==id);
+            Company? CompanyFromDb = _companyRepo.Get(x => x.CompanyId == id);
+
             return View(CompanyFromDb);
         }
 
+        [Authorize(Roles = "Admin,Company")]
         public IActionResult Create()
         {
             return View();
         }
+
         [HttpPost]
-        public IActionResult Create(Company obj)
+        [Authorize(Roles = "Admin,Company,Student")]
+        public IActionResult Create(Company obj, IFormFile? file)
         {
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            if (file != null)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                string companyLogoPath=Path.Combine(wwwRootPath, @"images\company_logo");
+
+                using(var fileStream = new FileStream(Path.Combine(companyLogoPath, fileName), FileMode.Create))
+                {
+                    file.CopyTo(fileStream);
+                }
+
+                obj.ImageUrl = @"images\company_logo\" + fileName;
+            }
             obj.RegistrationRequest = true;
             obj.RegistrationReqDate = DateTime.Now;
             _companyRepo.Add(obj);
-            _companyRepo.Save();  
+            _companyRepo.Save();
             return RedirectToAction("Index");
         }
 
@@ -57,7 +78,7 @@ namespace CodeIntern.Controllers
                 return NotFound();
             }
             //Company? CompanyFromDb = _unitOfWork.Company.Get(u => u.Id == id);
-            Company? CompanyFromDb1 = _companyRepo.Get(u=>u.CompanyId==id);
+            Company? CompanyFromDb1 = _companyRepo.Get(u => u.CompanyId == id);
             //Company? CompanyFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
 
             if (CompanyFromDb1 == null)
@@ -67,10 +88,33 @@ namespace CodeIntern.Controllers
             return View(CompanyFromDb1);
         }
         [HttpPost]
-        public IActionResult Edit(Company obj)
+        [Authorize(Roles = "Admin,Company")]
+        public IActionResult Edit(Company obj, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
+                if (file != null)
+                {
+                    string wwwRootPath = _webHostEnvironment.WebRootPath;
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string companyLogoPath = Path.Combine(wwwRootPath, @"images\company_logo");
+
+                    if(!string.IsNullOrEmpty(obj.ImageUrl)) 
+                    {
+                        var oldImageUrl = Path.Combine(wwwRootPath, obj.ImageUrl.TrimStart('\\'));
+                        if(System.IO.File.Exists(oldImageUrl))
+                        {
+                            System.IO.File.Delete(oldImageUrl);
+                        }
+                    }
+
+                    using (var fileStream = new FileStream(Path.Combine(companyLogoPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    obj.ImageUrl = @"images\company_logo\" + fileName;
+                }
                 _companyRepo.Update(obj);
                 _companyRepo.Save();
                 return RedirectToAction("Index");
@@ -78,14 +122,14 @@ namespace CodeIntern.Controllers
             return View();
 
         }
-
+        [Authorize(Roles = "Admin,Company")]
         public IActionResult Delete(int? id)
         {
             if (id == null || id == 0)
             {
                 return NotFound();
             }
-            Company? CompanyFromDb = _companyRepo.Get(x=>x.CompanyId==id);
+            Company? CompanyFromDb = _companyRepo.Get(x => x.CompanyId == id);
 
             if (CompanyFromDb == null)
             {
@@ -93,7 +137,9 @@ namespace CodeIntern.Controllers
             }
             return View(CompanyFromDb);
         }
+
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Admin,Company,Student")]
         public IActionResult DeletePOST(int? id)
         {
             Company? obj = _companyRepo.Get(x => x.CompanyId == id);
@@ -111,13 +157,13 @@ namespace CodeIntern.Controllers
         {
             List<Company> companies = _companyRepo.GetAll().ToList();
 
-            
+
             if (!string.IsNullOrEmpty(location) && location != "-")
             {
                 companies = companies.Where(x => x.City == location).ToList();
             }
 
-            
+
 
             return View("Index", companies);
         }

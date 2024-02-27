@@ -1,0 +1,34 @@
+﻿@model CodeIntern.Models.UpdateUserViewModel
+
+@{
+    ViewData["Title"] = "Update User Data";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h3 class="text-center">Update User Data</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="UpdateUser" method="post" class="form">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="form-group">
+                            <label asp-for="FullName">Full Name:</label>
+                            <input asp-for="FullName" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Email">Email:</label>
+                            <input asp-for="Email" class="form-control" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">Update User</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+﻿@model InternshipApplication
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2">All applications</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="row pb-3">
+            <div class="col-6">
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        First name
+                    </th>
+                    <th>
+                        Last name
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th>
+                        Application status
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                    <tr>
+                        <td>@Model.FirstName</td>
+                        <td>
+                        @Model.LastName
+                        </td>
+                        <td>
+                        @Model.Email
+                        </td>
+                        <td>
+                        @Model.Status
+                        </td>
+                        <td>
+                            <div class="w-75 btn-group" role="group">
+                            <a asp-controller="InternshipApplication" asp-action="ViewPdf" asp-route-id="@Model.InternshipApplicationId" class="btn btn-primary mx-2">
+                                    CV Preview
+                                </a>
+                            <a asp-controller="Internship" asp-action="Details" asp-route-id="@Model.InternshipId" class="btn btn-primary mx-2">
+                                    Back to internship
+                                </a>
+                            <a asp-controller="InternshipApplication" asp-action="Edit" asp-route-id="@Model.InternshipApplicationId" class="btn btn-primary mx-2">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+
+
+                            </div>
+                        </td>
+                    </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+

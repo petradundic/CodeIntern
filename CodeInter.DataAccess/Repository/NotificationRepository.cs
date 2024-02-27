@@ -28,7 +28,7 @@ namespace CodeIntern.DataAccess.Repository
             _db.SaveChanges();
         }
 
-        public void Update(Notification obj)
+        public void Update(Notification obj) 
         {
             _db.Notification.Update(obj);
         }

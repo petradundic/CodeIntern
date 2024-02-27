@@ -24,6 +24,8 @@ builder.Services.ConfigureApplicationCookie(options => {
     options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
 });
 
+builder.Services.Configure<IdentityOptions>(options =>options.SignIn.RequireConfirmedEmail=true);
+
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ICompanyRepository,CompanyRepository>();
 builder.Services.AddScoped<IInternshipRepository, InternshipRepository>();

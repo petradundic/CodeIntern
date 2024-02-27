@@ -29,7 +29,7 @@ namespace CodeIntern.Controllers
         {
             if(!_userManager.GetUserId(User).IsNullOrEmpty()) 
             {
-                List<Notification> notificationList = _notificationRepository.GetAll(x => x.ToUser == _userManager.GetUserId(User)).ToList();
+                List<Notification> notificationList = _notificationRepository.GetAll(x => x.ToUser == _userManager.GetUserId(User) && x.IsRead==false).ToList();
                 ViewBag.Notifications = notificationList;
             }
             

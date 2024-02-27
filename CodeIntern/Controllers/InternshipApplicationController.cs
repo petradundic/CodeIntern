@@ -9,6 +9,8 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.IO;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace CodeIntern.Controllers
 {
@@ -26,6 +28,7 @@ namespace CodeIntern.Controllers
             _userManager = userManager;
             _notificationRepository = notificationRepository;   
         }
+        [Authorize(Roles = "Admin,Company")]
         public IActionResult Index(int? internshipId, string? studentId)
         {
             List<InternshipApplication> applications = null;
@@ -43,10 +46,16 @@ namespace CodeIntern.Controllers
             }
             return View(applications);
         }
-        public IActionResult Details(int id)
+        [Authorize(Roles = "Admin,Student,Company")]
+        public IActionResult Details(int id, int notificationId)
         {
-            InternshipApplication? InternshipApplicationFromDb = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
-            return View(InternshipApplicationFromDb);
+            InternshipApplication? internshipApplicationFromDb = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
+            Notification notification = _notificationRepository.Get(x => x.NotificationId == notificationId);
+            notification.IsRead = true;
+            _notificationRepository.Update(notification);
+            _notificationRepository.Save();
+             
+            return View(internshipApplicationFromDb);
         }
 
         public IActionResult Create()
@@ -90,7 +99,7 @@ namespace CodeIntern.Controllers
             _internshipRepository.Update(internship);
             _internshipRepository.Save();
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", "Inernship", new { id = obj.InternshipId});
         }
 
         public IActionResult ViewPdf(int id)
@@ -162,7 +171,7 @@ namespace CodeIntern.Controllers
                     notification.InternshipApplicationId=internshipApplication.InternshipApplicationId;
                     notification.FromUser = _userManager.GetUserId(User);
                     notification.ToUser=studentId;
-                    notification.Text = $"Your application status has been changed to {model.SelectedStatus}.";
+                    notification.Text = $"Your application status for internsip {internship.Title} has been changed to {model.SelectedStatus}.";
                     notification.DateCreated=DateTime.Now;
                     notification.IsRead = false;
 
@@ -180,35 +189,35 @@ namespace CodeIntern.Controllers
             return View(model);
         }
 
-        //public IActionResult Delete(int? id)
-        //{
-        //    if (id == null || id == 0)
-        //    {
-        //        return NotFound();
-        //    }
-        //    InternshipApplication? InternshipApplicationFromDb = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
+            //public IActionResult Delete(int? id)
+            //{
+            //    if (id == null || id == 0)
+            //    {
+            //        return NotFound();
+            //    }
+            //    InternshipApplication? InternshipApplicationFromDb = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
 
-        //    if (InternshipApplicationFromDb == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(InternshipApplicationFromDb);
-        //}
-        //[HttpPost, ActionName("Delete")]
-        //public IActionResult DeletePOST(int? id)
-        //{
-        //    InternshipApplication? obj = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
-        //    if (obj == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    _internApplicationRepo.Remove(obj);
-        //    _internApplicationRepo.Save();
-        //    TempData["success"] = " InternshipApplication deleted successfully";
-        //    return RedirectToAction("Index");
-        //}
+            //    if (InternshipApplicationFromDb == null)
+            //    {
+            //        return NotFound();
+            //    }
+            //    return View(InternshipApplicationFromDb);
+            //}
+            //[HttpPost, ActionName("Delete")]
+            //public IActionResult DeletePOST(int? id)
+            //{
+            //    InternshipApplication? obj = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
+            //    if (obj == null)
+            //    {
+            //        return NotFound();
+            //    }
+            //    _internApplicationRepo.Remove(obj);
+            //    _internApplicationRepo.Save();
+            //    TempData["success"] = " InternshipApplication deleted successfully";
+            //    return RedirectToAction("Index");
+            //}
 
-        public async Task<IActionResult> Delete(int? id)
+            public async Task<IActionResult> Delete(int? id)
         {
             InternshipApplication? obj = await _internApplicationRepo.GetAsync(x => x.InternshipApplicationId == id);
 

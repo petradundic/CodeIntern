@@ -1,6 +1,7 @@
 ﻿using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
 using CodeIntern.Utility;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -38,13 +39,18 @@ namespace CodeIntern.Controllers
             _emailSender = emailSender;
         }
 
-        public async Task<IActionResult> DeleteUser(string id)
+        [Authorize(Roles = "Admin,Student,Company")]
+        public async Task<IActionResult> DeleteUser(string? id)
         {
             //vidi jel bolje obrisat iz AspUsers prije ili nakon cilog procesa
+            var currentUserId=_userManager.GetUserId(User);
+            var user = await _userManager.FindByIdAsync(currentUserId);
 
-            var user=await _userManager.FindByIdAsync(id);
+            if (!String.IsNullOrEmpty(id))
+                user = await _userManager.FindByIdAsync(id);
+            else
+                await _signInManager.SignOutAsync();
 
-            
             if (user == null)
             {
                 ViewBag.ErrorMessage = $"User with Id={id} not found";
@@ -83,13 +89,10 @@ namespace CodeIntern.Controllers
                                         if (notifications.Any())
                                         {
                                             await _notificationRepository.RemoveRangeAsync(notifications);
-
                                         }
 
                                     }
-
                                     await _internApplicationRepository.RemoveRangeAsync(internshipApplications);
-
                                 }
                             }
                             _internshipRepository.RemoveRange(intern);
@@ -121,17 +124,12 @@ namespace CodeIntern.Controllers
                                     await _notificationRepository.RemoveRangeAsync(notifications);
 
                                 }
-
                             }
 
                             await _internApplicationRepository.RemoveRangeAsync(internshipApplications);
 
                         }
-
-
                     }
-
-
                     return RedirectToAction("Index", "Home");
                 }
                 
@@ -142,13 +140,14 @@ namespace CodeIntern.Controllers
                 return View("Index");
             }
          }
-
+        [Authorize(Roles = "Admin,Company,Student")]
         public IActionResult ResetPassword()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Company,Student")]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel resetData)
         {
             var userId = _userManager.GetUserId(User);
@@ -202,7 +201,6 @@ namespace CodeIntern.Controllers
 
             return View();
         }
-
         public IActionResult ForgotPassword()
         {
             return View();
@@ -242,79 +240,43 @@ namespace CodeIntern.Controllers
             return View();
         }
 
+        public IActionResult UpdateUser()
+        {
+            return View();
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateUser(UpdateUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.Id);
 
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "User not found.");
+                    return View("UpdateUser", model);
+                }
 
-        //    public async Task<IActionResult> UpdateUser(string id)
-        //{
-        //    // Find the user by their ID
-        //    var user = await _userManager.FindByIdAsync(id);
+                user.Email = model.Email;
+                user.UserName = model.FullName; 
 
-        //    if (user == null)
-        //    {
-        //        // User not found
-        //        return NotFound();
-        //    }
+                var result = await _userManager.UpdateAsync(user);
 
-        //    // Optionally, you can load the user's associated claims and roles here
-        //    // var userClaims = await _userManager.GetClaimsAsync(user);
-        //    // var userRoles = await _userManager.GetRolesAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index"); // Redirect to a success page or your desired action.
+                }
 
-        //    return View(user); // Pass the user to the view for editing
-        //}
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> UpdateUser(string id, IdentityUser updatedUser, string password)
-        //{
-        //    if (id != updatedUser.Id)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        var user = await _userManager.FindByIdAsync(id);
-
-        //        if (user == null)
-        //        {
-        //            return NotFound();
-        //        }
-
-        //        // Update user properties
-        //        user.Email = updatedUser.Email;
-        //        user.UserName = updatedUser.Email; // Assuming username is the same as email
-        //                                           // You can add more updates here as needed
-
-        //        // Update the user's password if it's provided
-        //        if (!string.IsNullOrEmpty(password))
-        //        {
-        //            var newPasswordHash = _userManager.PasswordHasher.HashPassword(user, password);
-        //            user.PasswordHash = newPasswordHash;
-        //        }
-
-        //        // Save changes to the user
-        //        var result = await _userManager.UpdateAsync(user);
-
-        //        if (result.Succeeded)
-        //        {
-        //            // Optionally, sign the user out and back in to refresh the authentication cookie
-        //            await _signInManager.SignOutAsync();
-        //            await _signInManager.SignInAsync(user, isPersistent: false);
-
-        //            return RedirectToAction("Index", "Home"); // Redirect to a success page
-        //        }
-
-        //        // Handle errors here if the update fails
-        //        foreach (var error in result.Errors)
-        //        {
-        //            ModelState.AddModelError(string.Empty, error.Description);
-        //        }
-        //    }
-
-        //    // If ModelState is not valid, return to the edit view with validation errors
-        //    return View(updatedUser);
-        //}
+            return View("UpdateUser", model); // If there are validation errors, redisplay the form with error messages.
+        }
 
         public IActionResult Index()
         {
@@ -326,7 +288,6 @@ namespace CodeIntern.Controllers
             var users = _userManager.Users.ToList(); 
             return View(users);
         }
-
         
     }
 }

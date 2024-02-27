@@ -2,10 +2,12 @@
 using CodeIntern.DataAccess.Repository;
 using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace CodeIntern.Controllers
 {
@@ -22,27 +24,32 @@ namespace CodeIntern.Controllers
             _internshipRepo = internshipRepository;
             _internApplicationRepo = internApplicationRepo; 
         }
-        public IActionResult Index(string? companyId, List<Internship>? obj )
+        public IActionResult Index(string? companyName, List<Internship>? obj )
         {
             if(obj != null && obj.Count > 0)
             {
                 return View(obj);
             }
-
-            List<Internship> InternshipsList = _internshipRepo.GetAll().ToList();
-            return View(InternshipsList);
+            List<Internship> internshipsList = _internshipRepo.GetAll().ToList();
+            if (!string.IsNullOrEmpty(companyName))
+            {
+                internshipsList = _internshipRepo.GetAll(x=>x.CompanyName==companyName).ToList();
+            }
+            return View(internshipsList);
         }
 
-        public IActionResult ExpiredInternships()
+        [Authorize(Roles = "Company")]
+        public IActionResult ExpiredInternships(List<Internship>? internships)
         {
+            var userId = _userManager.GetUserId(User);
 
-            List<Internship> InternshipsList = _internshipRepo.GetAll(x=>x.StartDate < DateTime.Now).ToList();
+            List<Internship> InternshipsList = _internshipRepo.GetAll(x=>x.StartDate < DateTime.Now && x.CompanyId== userId).ToList();
             if (InternshipsList != null && InternshipsList.Count > 0)
             {
-                return View("Index", InternshipsList);
+                return View(InternshipsList);
             }
             //dodaj neku poruku
-            return View("Index");
+            return View("Index", userId);
         }
         public IActionResult Details(int id)
         {
@@ -50,15 +57,10 @@ namespace CodeIntern.Controllers
             ViewBag.UserId = userId;
 
             InternshipApplication? internApp= _internApplicationRepo.Get(x=>x.InternshipId==id && x.StudentId==userId);
-            if (internApp != null)
-            {
-                ViewBag.HasApplied = true;
-                ViewBag.InternshipApplicationId = internApp.InternshipApplicationId;
-            }
-            else
-            {
-                ViewBag.HasApplied = false;
-            }
+            SavedInternship? savedInternship = _savedInternRepo.Get(x => x.InternshipId == id && x.StudentId == userId);
+            ViewBag.HasApplied = internApp != null;
+            ViewBag.InternshipApplicationId = internApp?.InternshipApplicationId;
+            ViewBag.IsSaved = savedInternship != null;
 
             Internship? InternshipFromDb = _internshipRepo.Get(x => x.InternshipId == id);
             return View(InternshipFromDb);
@@ -77,8 +79,6 @@ namespace CodeIntern.Controllers
                 _savedInternRepo.Add(savedInternship);
                 _savedInternRepo.Save();
             }
-
-
             return RedirectToAction("Index");
         }
 

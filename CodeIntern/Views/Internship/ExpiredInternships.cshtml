@@ -8,23 +8,6 @@
             </div>
         </div>
     </div>
-    <div class="card-body p-4">
-        <div class="row pb-3">
-            <div class="col-6">
-            </div>
-            @if (User.IsInRole(SD.Role_Company)){
-            <div class="col-6 text-end">
-                <a asp-controller="Internship" asp-action="Create" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Create New Internship
-                </a>
-            </div>
-                <div class="col-6 text-end">
-                    <a asp-controller="Internship" asp-action="ExpiredInternships" class="btn btn-primary">
-                        <i class="bi bi-plus-circle"></i> See expired internships
-                    </a>
-                </div>
-            }
-        </div>
         <div class="mb-3">
             <button id="filterButton" class="btn btn-primary" type="button">Filter</button>
             <div id="filterOptions" class="mt-3" style="display: none;">
@@ -105,12 +88,12 @@
                         <td>
                             @obj.Description
                         </td>
-                        
+
                         <td>
                             <div class="w-75 btn-group" role="group">
-                                
+
                                 <a asp-controller="Internship" asp-action="Details" asp-route-id="@obj.InternshipId" class="btn btn-primary mx-2">
-                                     Details
+                                    Details
                                 </a>
                                 @if (User.IsInRole(SD.Role_Company) || User.IsInRole(SD.Role_Admin))
                                 {
@@ -151,7 +134,7 @@
         var prLanguageFilter = document.getElementById("prLanguageFilter");
         var techFilter = document.getElementById("techFilter");
         var workPlaceFilter = document.getElementById("workPlaceFilter");
-        
+
 
 
         var paidValue = paidFilter ? paidFilter.value : "";

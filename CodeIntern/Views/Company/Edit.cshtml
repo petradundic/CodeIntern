@@ -8,61 +8,70 @@
         </div>
     </div>
     <div class="card-body p-4">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             <input asp-for="CompanyId" hidden />
-            <div class="border p-3 mt-4">
-                
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="CompanyName" class="form-control border-0 shadow" />
-                    <label asp-for="CompanyName" class="ms-2"></label>
-                    
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Website" class="form-control border-0 shadow" />
-                    <label asp-for="Website" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Email" class="form-control border-0 shadow" />
-                    <label asp-for="Email" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Country" class="form-control border-0 shadow" />
-                    <label asp-for="Country" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="City" class="form-control border-0 shadow" />
-                    <label asp-for="City" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Address" class="form-control border-0 shadow" />
-                    <label asp-for="Address" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Industry" class="form-control border-0 shadow" />
-                    <label asp-for="Industry" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Description" class="form-control border-0 shadow" />
-                    <label asp-for="Description" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="ImageUrl" type="file" class="form-control border-0 shadow" />
-                    <label asp-for="ImageUrl" class="ms-2"></label>
-                </div>
+            
+                <div class="row">
+                    <div class="col-10">
+                    <div class="border p-3 mt-4">
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="CompanyName" class="form-control border-0 shadow" />
+                            <label asp-for="CompanyName" class="ms-2"></label>
 
-                <div class="row mt-3">
-                    <div class="col-6 col-md-3">
-                        <button type="submit" class="btn btn-primary form-control">Update</button>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Website" class="form-control border-0 shadow" />
+                            <label asp-for="Website" class="ms-2"></label>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Email" class="form-control border-0 shadow" />
+                            <label asp-for="Email" class="ms-2"></label>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Country" class="form-control border-0 shadow" />
+                            <label asp-for="Country" class="ms-2"></label>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="City" class="form-control border-0 shadow" />
+                            <label asp-for="City" class="ms-2"></label>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Address" class="form-control border-0 shadow" />
+                            <label asp-for="Address" class="ms-2"></label>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Industry" class="form-control border-0 shadow" />
+                            <label asp-for="Industry" class="ms-2"></label>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Description" class="form-control border-0 shadow" />
+                            <label asp-for="Description" class="ms-2"></label>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input type="file" name="file" class="form-control border-0 shadow" />
+                            <label asp-for="ImageUrl" class="ms-2"></label>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-6 col-md-3">
+                                <button type="submit" class="btn btn-primary form-control">Update</button>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a asp-controller="Company" asp-action="Index" class="btn btn-secondary border  form-control">
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+
+
                     </div>
-                    <div class="col-6 col-md-3">
-                        <a asp-controller="Company" asp-action="Index" class="btn btn-secondary border  form-control">
-                            Back to List
-                        </a>
+                    </div>
+                    <div class="col-2">
+                        <img src="@Model.ImageUrl" width="100%" 
+                        style="border-radius:5px ; border:1px solid #bbb9b9"/>
                     </div>
                 </div>
-
-
-            </div>
+            
         </form>
     </div>
 </div>

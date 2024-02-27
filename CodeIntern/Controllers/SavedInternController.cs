@@ -31,9 +31,6 @@ namespace CodeIntern.Controllers
                 temp = _internshipRepository.Get(x => x.InternshipId == item.InternshipId);
                 internships.Add(temp);
             }
-
-
-
             return View(internships);
         }
 
