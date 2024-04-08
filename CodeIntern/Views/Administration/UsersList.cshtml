@@ -17,11 +17,11 @@
             <tr data-user-id="@user.Id" class="user-row">
                 <td>@user.UserName</td>
                 <td>@user.Email</td>
-                <td>
-                    <button class="btn btn-primary edit-button">Edit</button>
-                    
-                    <form method="post" asp-controller="Administration" asp-action="DeleteUser" asp-route-id="@user.Id">
-                      <button type="submit" class="btn btn-danger mx-2">
+                <td class="d-flex">
+                    <button class="btn btn-primary edit-button mx-2">Edit</button>
+
+                    <form class="deleteUserForm">
+                        <button type="button" class="btn btn-danger mx-2" onclick="deleteUser('@user.Id')">
                             <i class="bi bi-trash-fill"></i> Delete
                         </button>
                     </form>

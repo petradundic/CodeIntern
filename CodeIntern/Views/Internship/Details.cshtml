@@ -39,8 +39,8 @@
                 else
                 {
                     <div class="col-6 col-md-3">
-                        <form method="post" asp-controller="InternshipApplication" asp-action="Delete" asp-route-id="@ViewBag.InternshipApplicationId">
-                            <button type="submit" class="btn btn-danger mx-2">
+                        <form id="cancelApplicationForm" data-application-id="@ViewBag.InternshipApplicationId">
+                            <button type="button" class="btn btn-danger mx-2" onclick="cancelApplication()">
                                 <i class="bi bi-trash-fill"></i> Cancel application
                             </button>
                         </form>

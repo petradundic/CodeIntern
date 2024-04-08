@@ -7,6 +7,7 @@ using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.DataAccess.Repository;
 using CodeIntern.Models;
 using System.Configuration;
+using CodeIntern.Areas.Identity.Pages.Account;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,7 @@ builder.Services.AddScoped<IInternApplicationRepository, InternApplicationReposi
 builder.Services.AddScoped<ISavedInternRepository, SavedInternRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IEmailSender,EmailSender>();
+builder.Services.AddScoped<RegisterModel>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

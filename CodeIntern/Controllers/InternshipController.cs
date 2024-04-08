@@ -5,6 +5,7 @@ using CodeIntern.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -26,7 +27,15 @@ namespace CodeIntern.Controllers
         }
         public IActionResult Index(string? companyName, List<Internship>? obj )
         {
-            if(obj != null && obj.Count > 0)
+            IEnumerable<SelectListItem> technologies = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.Technology, Value = x.Technology });
+            IEnumerable<SelectListItem> positions = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.Position, Value = x.Position });
+            IEnumerable<SelectListItem> progLanguages = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.ProgLanguage, Value = x.ProgLanguage });
+
+            ViewBag.Technologies=technologies; 
+            ViewBag.Positions=positions;
+           c=progLanguages;
+
+            if (obj != null && obj.Count > 0)
             {
                 return View(obj);
             }
@@ -53,6 +62,7 @@ namespace CodeIntern.Controllers
         }
         public IActionResult Details(int id)
         {
+            Internship? InternshipFromDb = _internshipRepo.Get(x => x.InternshipId == id);
             var userId = _userManager.GetUserId(User);
             ViewBag.UserId = userId;
 
@@ -62,11 +72,11 @@ namespace CodeIntern.Controllers
             ViewBag.InternshipApplicationId = internApp?.InternshipApplicationId;
             ViewBag.IsSaved = savedInternship != null;
 
-            Internship? InternshipFromDb = _internshipRepo.Get(x => x.InternshipId == id);
+            
             return View(InternshipFromDb);
         }
 
-        
+        [Authorize(Roles = "Student")]
         public IActionResult SaveInternship(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -81,12 +91,14 @@ namespace CodeIntern.Controllers
             }
             return RedirectToAction("Index");
         }
-
+        [Authorize(Roles = "Admin,Company")]
         public IActionResult Create()
         {
             return View();
         }
+        
         [HttpPost]
+        [Authorize(Roles = "Admin,Company")]
         public IActionResult Create(Internship obj)
         {
             //dodaj uvjet i validaciju za start date da ne bude ranije od kreiranog i da bude 7 dana od kreiranja
@@ -98,7 +110,7 @@ namespace CodeIntern.Controllers
             return RedirectToAction("Index");
         }
 
-
+        [Authorize(Roles = "Admin,Company")]
         public IActionResult Edit(int? id)
         {
             if (id == null || id == 0)
@@ -113,7 +125,10 @@ namespace CodeIntern.Controllers
             }
             return View(InternshipFromDb1);
         }
+
+        
         [HttpPost]
+        [Authorize(Roles = "Admin,Company")]
         public IActionResult Edit(Internship obj)
         {
             if (ModelState.IsValid)
@@ -125,7 +140,7 @@ namespace CodeIntern.Controllers
             return View();
              
         }
-
+        [Authorize(Roles = "Admin,Company")]
         public IActionResult Delete(int? id)
         {
             if (id == null || id == 0)
@@ -141,6 +156,7 @@ namespace CodeIntern.Controllers
             return View(InternshipFromDb);
         }
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Admin,Company")]
         public IActionResult DeletePOST(int? id)
         {
             Internship? obj = _internshipRepo.Get(x => x.InternshipId == id); ;

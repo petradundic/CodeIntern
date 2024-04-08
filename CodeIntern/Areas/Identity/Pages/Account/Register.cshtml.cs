@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -24,6 +20,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using CodeIntern.DataAccess.Repository;
 using CodeIntern.DataAccess.Repository.IRepository;
+using Org.BouncyCastle.Utilities.Collections;
 
 namespace CodeIntern.Areas.Identity.Pages.Account
 {
@@ -47,7 +44,7 @@ namespace CodeIntern.Areas.Identity.Pages.Account
             IEmailSender emailSender,
             ICompanyRepository companyRepo)
         {
-            _roleManager= roleManager;
+            _roleManager = roleManager;
             _userManager = userManager;
             _userStore = userStore;
             _emailStore = GetEmailStore();
@@ -113,13 +110,13 @@ namespace CodeIntern.Areas.Identity.Pages.Account
 
             public string? Role { get; set; }
             [ValidateNever]
-            public IEnumerable<SelectListItem>? RoleList { get; set;}
+            public IEnumerable<SelectListItem>? RoleList { get; set; }
 
             public int? CompanyId { get; set; }
             [ValidateNever]
             public IEnumerable<SelectListItem>? CompanyList { get; set; }
 
-       
+
         }
 
 
@@ -127,18 +124,18 @@ namespace CodeIntern.Areas.Identity.Pages.Account
         {
             Input = new()
             {
-                RoleList = _roleManager.Roles.Select(x => x.Name).Select(i=>new SelectListItem
+                RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
                 {
-                    Text=i,
-                    Value=i
+                    Text = i,
+                    Value = i
 
                 }),
-                 CompanyList = _companyRepo.GetAll().Select(i => new SelectListItem
-                 {
-                     Text = i.CompanyName,
-                     Value = i.CompanyId.ToString()
+                CompanyList = _companyRepo.GetAll().Select(i => new SelectListItem
+                {
+                    Text = i.CompanyName,
+                    Value = i.CompanyId.ToString()
 
-                 })
+                })
             };
 
             ReturnUrl = returnUrl;
@@ -149,7 +146,7 @@ namespace CodeIntern.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -163,17 +160,7 @@ namespace CodeIntern.Areas.Identity.Pages.Account
                     Input.Role = SD.Role_Student;
                     await _userManager.AddToRoleAsync(user, Input.Role);
                 }
-                if (Input.Role == SD.Role_Company)
-                {
-                    user.CompanyId = Input.CompanyId;
 
-                    Company company=_companyRepo.Get(x=>x.CompanyId==Input.CompanyId);
-                    company.RegistrationApprovedDate=DateTime.Now;
-                    company.RegistrationRequest = false;
-                    _companyRepo.Update(company);
-                }
-
-                
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
@@ -210,6 +197,53 @@ namespace CodeIntern.Areas.Identity.Pages.Account
             return Page();
         }
 
+
+        public async Task<IActionResult> RegisterCompanyUser(int companyId)
+        {
+            string password = CreateRandomPassword(15) + "1!";
+            var user = CreateUser();
+            user.CompanyId = companyId;
+
+            Company company = _companyRepo.Get(x => x.CompanyId == user.CompanyId);
+            company.RegistrationApprovedDate = DateTime.Now;
+            company.RegistrationRequest = false;
+            _companyRepo.Update(company);
+
+            await _userStore.SetUserNameAsync(user, company.Email, CancellationToken.None);
+            await _emailStore.SetEmailAsync(user, company.Email, CancellationToken.None);
+            user.EmailConfirmed = true;
+            var result = await _userManager.CreateAsync(user, password);
+            await _userManager.AddToRoleAsync(user, SD.Role_Company);
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User created a new account with password.");
+
+
+                await _emailSender.SendEmailAsync(company.Email, "Your initial password",
+                        $"Your password is {password} and you should change it after logging into application for the first time.");
+            }
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+
+            return RedirectToAction("Index", "Home");
+
+        }
+        public string CreateRandomPassword(int PasswordLength)
+        {
+            string _allowedChars = "0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ";
+            Random randNum = new Random();
+            char[] chars = new char[PasswordLength];
+            int allowedCharCount = _allowedChars.Length;
+            for (int i = 0; i < PasswordLength; i++)
+            {
+                chars[i] = _allowedChars[(int)((_allowedChars.Length) * randNum.NextDouble())];
+            }
+            return new string(chars);
+        }
         private ApplicationUser CreateUser()
         {
             try

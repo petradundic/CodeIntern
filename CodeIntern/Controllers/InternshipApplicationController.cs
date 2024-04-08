@@ -1,15 +1,8 @@
 ﻿using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
-using iTextSharp.text.pdf;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
-using System.IO;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.AspNetCore.Authorization;
 using System.Data;
 
 namespace CodeIntern.Controllers
@@ -26,17 +19,17 @@ namespace CodeIntern.Controllers
             _internApplicationRepo = db;
             _internshipRepository = internshipRepository;
             _userManager = userManager;
-            _notificationRepository = notificationRepository;   
+            _notificationRepository = notificationRepository;
         }
-        [Authorize(Roles = "Admin,Company")]
+        [Authorize(Roles = "Admin,Company,Student")]
         public IActionResult Index(int? internshipId, string? studentId)
         {
             List<InternshipApplication> applications = null;
-            if(internshipId != null)
+            if (internshipId != null)
             {
-                applications = _internApplicationRepo.GetAll(x=>x.InternshipId==internshipId).ToList();
+                applications = _internApplicationRepo.GetAll(x => x.InternshipId == internshipId).ToList();
             }
-            else if(!String.IsNullOrEmpty(studentId))
+            else if (!String.IsNullOrEmpty(studentId))
             {
                 applications = _internApplicationRepo.GetAll(x => x.StudentId == studentId).ToList();
             }
@@ -46,7 +39,7 @@ namespace CodeIntern.Controllers
             }
             return View(applications);
         }
-        [Authorize(Roles = "Admin,Student,Company")]
+        [Authorize(Roles = "Admin, Company, Student")]
         public IActionResult Details(int id, int notificationId)
         {
             InternshipApplication? internshipApplicationFromDb = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
@@ -54,34 +47,35 @@ namespace CodeIntern.Controllers
             notification.IsRead = true;
             _notificationRepository.Update(notification);
             _notificationRepository.Save();
-              
+
             return View(internshipApplicationFromDb);
         }
-
+        [Authorize(Roles = "Admin, Student")]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin, Student")]
         public IActionResult Create(ApplicationViewModel temp, int InternshipId)
         {
-            
-                // Convert IFormFile to byte array
-                byte[] cvBytes = null;
-                if (temp.CvFile != null)
+
+            // Convert IFormFile to byte array
+            byte[] cvBytes = null;
+            if (temp.CvFile != null)
+            {
+                using (var memoryStream = new MemoryStream())
                 {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        temp.CvFile.CopyTo(memoryStream);
-                        cvBytes = memoryStream.ToArray();
-                    }
+                    temp.CvFile.CopyTo(memoryStream);
+                    cvBytes = memoryStream.ToArray();
                 }
+            }
 
-                InternshipApplication obj = new InternshipApplication();
+            InternshipApplication obj = new InternshipApplication();
 
-                Internship internship = _internshipRepository.Get(x => x.InternshipId == InternshipId);
-                var userId = _userManager.GetUserId(User);
+            Internship internship = _internshipRepository.Get(x => x.InternshipId == InternshipId);
+            var userId = _userManager.GetUserId(User);
 
             obj.InternshipId = InternshipId;
             obj.StudentId = userId;
@@ -91,7 +85,7 @@ namespace CodeIntern.Controllers
             obj.Email = temp.Email;
             obj.CV = cvBytes;
             obj.Status = "Applied";
-            obj.InternshipTitle=internship.Title;
+            obj.InternshipTitle = internship.Title;
 
             _internApplicationRepo.Add(obj);
             _internApplicationRepo.Save();
@@ -99,19 +93,15 @@ namespace CodeIntern.Controllers
             _internshipRepository.Update(internship);
             _internshipRepository.Save();
 
-            return RedirectToAction("Details", "Inernship", new { id = obj.InternshipId});
+            return RedirectToAction("Details", "Internship", new { id = obj.InternshipId });
         }
-
+        [Authorize(Roles = "Admin, Company, Student")]
         public IActionResult ViewPdf(int id)
-        { 
-            InternshipApplication obj= _internApplicationRepo.Get(X=> X.InternshipApplicationId==id);
+        {
+            InternshipApplication obj = _internApplicationRepo.Get(X => X.InternshipApplicationId == id);
             return File(obj.CV, "application/pdf");
-
-
         }
-
-
-
+        [Authorize(Roles = "Admin, Company, Student")]
         public IActionResult Edit(int id)
         {
             InternshipApplication internshipApplication = _internApplicationRepo.Get(u => u.InternshipApplicationId == id);
@@ -133,6 +123,7 @@ namespace CodeIntern.Controllers
             return View(editViewModel);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin, Company, Student")]
         public IActionResult Edit(EditViewModel model)
         {
             if (ModelState.IsValid)
@@ -149,13 +140,13 @@ namespace CodeIntern.Controllers
                 byte[] cvBytes = null;
                 if (model.CvFile != null)
                 {
-                        using (var memoryStream = new MemoryStream())
-                        {
-                            model.CvFile.CopyTo(memoryStream);
-                            cvBytes = memoryStream.ToArray();
-                        }
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        model.CvFile.CopyTo(memoryStream);
+                        cvBytes = memoryStream.ToArray();
+                    }
 
-                    internshipApplication.CV=cvBytes;
+                    internshipApplication.CV = cvBytes;
                 }
 
                 if (model.SelectedStatus != internshipApplication.Status)
@@ -167,12 +158,12 @@ namespace CodeIntern.Controllers
                     string studentId = internshipApplication.StudentId;
 
 
-                    Notification notification=new Notification();
-                    notification.InternshipApplicationId=internshipApplication.InternshipApplicationId;
+                    Notification notification = new Notification();
+                    notification.InternshipApplicationId = internshipApplication.InternshipApplicationId;
                     notification.FromUser = _userManager.GetUserId(User);
-                    notification.ToUser=studentId;
+                    notification.ToUser = studentId;
                     notification.Text = $"Your application status for internsip {internship.Title} has been changed to {model.SelectedStatus}.";
-                    notification.DateCreated=DateTime.Now;
+                    notification.DateCreated = DateTime.Now;
                     notification.IsRead = false;
 
                     _notificationRepository.Add(notification);
@@ -189,38 +180,11 @@ namespace CodeIntern.Controllers
             return View(model);
         }
 
-            //public IActionResult Delete(int? id)
-            //{
-            //    if (id == null || id == 0)
-            //    {
-            //        return NotFound();
-            //    }
-            //    InternshipApplication? InternshipApplicationFromDb = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
-
-            //    if (InternshipApplicationFromDb == null)
-            //    {
-            //        return NotFound();
-            //    }
-            //    return View(InternshipApplicationFromDb);
-            //}
-            //[HttpPost, ActionName("Delete")]
-            //public IActionResult DeletePOST(int? id)
-            //{
-            //    InternshipApplication? obj = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
-            //    if (obj == null)
-            //    {
-            //        return NotFound();
-            //    }
-            //    _internApplicationRepo.Remove(obj);
-            //    _internApplicationRepo.Save();
-            //    TempData["success"] = " InternshipApplication deleted successfully";
-            //    return RedirectToAction("Index");
-            //}
-
-            public async Task<IActionResult> Delete(int? id)
+        [Authorize(Roles = "Admin, Company, Student")]
+        public async Task<IActionResult> Delete(int? id)
         {
             InternshipApplication? obj = await _internApplicationRepo.GetAsync(x => x.InternshipApplicationId == id);
-
+            Internship internship = _internshipRepository.Get(x => x.InternshipId == obj.InternshipId);
             if (obj == null)
             {
                 return NotFound();
@@ -228,8 +192,11 @@ namespace CodeIntern.Controllers
 
             _internApplicationRepo.Remove(obj);
             await _internApplicationRepo.SaveAsync();
+            internship.NumOfApplications -= 1;
+            _internshipRepository.Update(internship);
+            _internshipRepository.Save();
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Internship");
         }
     }
 }

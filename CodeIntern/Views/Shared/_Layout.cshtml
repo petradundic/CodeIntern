@@ -64,8 +64,14 @@
                     {
                         <ul class="navbar-nav">
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-white" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle text-white position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="bi bi-bell"></i>
+                                    @if (ViewBag.Notifications != null && ViewBag.Notifications.Count>0)
+                                    {
+                                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                                            @ViewBag.Notifications.Count
+                                        </span>
+                                    }
                                 </a>
                                 @if (ViewBag.Notifications != null)
                                 {

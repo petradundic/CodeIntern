@@ -1,8 +1,10 @@
 ﻿using CodeIntern.DataAccess.Data;
 using CodeIntern.DataAccess.Repository.IRepository;
 using CodeIntern.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace CodeIntern.Controllers
 {
@@ -17,6 +19,7 @@ namespace CodeIntern.Controllers
             _userManager = userManager;
             _internshipRepository = internshipRepository;
         }
+        [Authorize(Roles = "Admin,Student")]
         public IActionResult Index()
         {
             //preko user id pretraziti po listi savedinternship pa pomocu toga pozvati internship i u listi displayat spremljene
@@ -34,6 +37,7 @@ namespace CodeIntern.Controllers
             return View(internships);
         }
 
+        [Authorize(Roles = "Admin,Student")]
         public async Task<IActionResult> Delete(int? id)
         {
             SavedInternship? obj = await _savedInternRepo.GetAsync(x => x.InternshipId == id);

@@ -5,6 +5,7 @@ using CodeIntern.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using CodeIntern.Areas.Identity.Pages.Account;
 
 namespace CodeIntern.Controllers
 {
@@ -12,10 +13,12 @@ namespace CodeIntern.Controllers
     {
         private readonly ICompanyRepository _companyRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public CompanyController(ICompanyRepository db, IWebHostEnvironment webHostEnvironment)
+        private readonly RegisterModel _registerModel;
+        public CompanyController(ICompanyRepository db, IWebHostEnvironment webHostEnvironment, RegisterModel registerModel)
         {
             _companyRepo = db;
             _webHostEnvironment = webHostEnvironment;
+            _registerModel = registerModel; 
         }
         public IActionResult Index(List<Company>? obj)
         {
@@ -39,15 +42,13 @@ namespace CodeIntern.Controllers
 
             return View(CompanyFromDb);
         }
-
-        [Authorize(Roles = "Admin,Company")]
+   
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Company,Student")]
         public IActionResult Create(Company obj, IFormFile? file)
         {
             string wwwRootPath = _webHostEnvironment.WebRootPath;
@@ -70,6 +71,11 @@ namespace CodeIntern.Controllers
             return RedirectToAction("Index");
         }
 
+        public async Task<IActionResult> RegisterCompany(int companyId)
+        {
+            var result = await _registerModel.RegisterCompanyUser(companyId);
+            return result;
+        }
 
         public IActionResult Edit(int? id)
         {
