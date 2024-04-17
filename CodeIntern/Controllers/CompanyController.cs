@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using CodeIntern.Areas.Identity.Pages.Account;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CodeIntern.Controllers
 {
@@ -22,6 +23,9 @@ namespace CodeIntern.Controllers
         }
         public IActionResult Index(List<Company>? obj)
         {
+            IEnumerable<SelectListItem> locations = _companyRepo.GetAll().Select(x => x.City).Distinct().OrderBy(city => city).Select(city => new SelectListItem { Text = city, Value = city });
+            ViewBag.Locations = locations;
+
             if (obj != null && obj.Count > 0)
             {
                 return View(obj);

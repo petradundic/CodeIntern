@@ -34,42 +34,26 @@
                 </div>
                 <div class="form-group">
                     <label for="locationFilter">Location:</label>
-                    <select id="locationFilter" class="form-select">
+                    <select asp-items="ViewBag.Locations" id="locationFilter" class="form-select">
                         <option>-</option>
-                        @foreach (var city in ViewBag.Locations)
-                        {
-                            <option value="@city">@city</option>
-                        }
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="positionFilter">Position:</label>
-                    <select id="positionFilter" class="form-select">
+                    <select asp-items="ViewBag.Positions" id="positionFilter" class="form-select">
                         <option>-</option>
-                        @foreach (var position in ViewBag.Positions)
-                        {
-                            <option value="@position">@position</option>
-                        }
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="prLanguageFilter">Prog. language:</label>
-                    <select id="prLanguageFilter" class="form-select">
+                    <select asp-items="ViewBag.ProgramLanguages" id="prLanguageFilter" class="form-select">
                         <option>-</option>
-                        @foreach (var prLanguage in ViewBag.ProgramLanguages)
-                        {
-                            <option value="@prLanguage">@prLanguage</option>
-                        }
-                    </select>
+                    </select> 
                 </div>
                 <div class="form-group">
                     <label for="techFilter">Technology:</label>
-                    <select id="techFilter" class="form-select">
+                    <select asp-items="ViewBag.Technologies" id="techFilter" class="form-select">
                         <option>-</option>
-                        @foreach (var tech in ViewBag.Technologies)
-                        {
-                            <option value="@tech">@tech</option>
-                        }
                     </select>
                 </div>
                 <div class="form-group">
@@ -92,7 +76,10 @@
                         Title
                     </th>
                     <th>
-                        Internship Description
+                        Company
+                    </th>
+                    <th>
+                        Start Date
                     </th>
                     <th></th>
                 </tr>
@@ -103,7 +90,12 @@
                     <tr>
                         <td>@obj.Title</td>
                         <td>
-                            @obj.Description
+                            @obj.CompanyName
+
+                        </td>
+                        <td>
+                            @obj.StartDate
+
                         </td>
                         
                         <td>

@@ -25,12 +25,8 @@
 
                 <div class="form-group">
                     <label for="locationFilter">Location:</label>
-                    <select id="locationFilter" class="form-select">
+                    <select asp-items="ViewBag.Locations" id="locationFilter" class="form-select">
                         <option>-</option>
-                        @foreach (var city in SD.Cities)
-                        {
-                            <option value="@city">@city</option>
-                        }
                     </select>
                 </div>
                 <button id="applyFilterButton" class="btn btn-primary" type="button">Apply Filter</button>

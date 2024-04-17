@@ -27,13 +27,15 @@ namespace CodeIntern.Controllers
         }
         public IActionResult Index(string? companyName, List<Internship>? obj )
         {
-            IEnumerable<SelectListItem> technologies = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.Technology, Value = x.Technology });
-            IEnumerable<SelectListItem> positions = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.Position, Value = x.Position });
-            IEnumerable<SelectListItem> progLanguages = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.ProgLanguage, Value = x.ProgLanguage });
+            IEnumerable<SelectListItem> technologies = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.Technology, Value = x.Technology }).Distinct().OrderBy(tech => tech);
+            IEnumerable<SelectListItem> positions = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.Position, Value = x.Position }).Distinct().OrderBy(pos => pos);
+            IEnumerable<SelectListItem> progLanguages = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.ProgLanguage, Value = x.ProgLanguage }).Distinct().OrderBy(lang => lang);
+            IEnumerable<SelectListItem> locations = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.Location, Value = x.Location }).Distinct().OrderBy(loc => loc);
 
-            ViewBag.Technologies=technologies; 
-            ViewBag.Positions=positions;
-           c=progLanguages;
+            ViewBag.Technologies = technologies;
+            ViewBag.Positions = positions;
+            ViewBag.ProgramLanguages = progLanguages;
+            ViewBag.Locations = locations;
 
             if (obj != null && obj.Count > 0)
             {
@@ -105,6 +107,10 @@ namespace CodeIntern.Controllers
             var userId = _userManager.GetUserId(User);
             obj.CompanyId = userId;
             obj.CreatedDate = DateTime.Now;
+            var startDate = obj.StartDate.Date;
+            var endDate = obj.EndDate.Date;
+            obj.StartDate = startDate;
+            obj.EndDate = endDate;
             _internshipRepo.Add(obj);
             _internshipRepo.Save();
             return RedirectToAction("Index");
