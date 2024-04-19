@@ -13,8 +13,8 @@ namespace CodeIntern.Models
         public string Id { get; set; }
 
         [Required]
-        [Display(Name = "Full Name")]
-        public string FullName { get; set; }
+        [Display(Name = "Username")]
+        public string UserName { get; set; }
 
         [Required]
         [EmailAddress]

@@ -3,6 +3,13 @@
 
 // Write your JavaScript code.
 
+document.getElementById('notificationsDropdown').addEventListener('click', function () {
+    var badge = this.querySelector('.badge');
+    if (badge) {
+        badge.remove();
+    }
+});
+
 function ShowMessage(message) {
     Swal.fire({
         text: message,
@@ -59,10 +66,5 @@ function Delete(url, message1, message2) {
     });
 }
 
-document.getElementById('notificationsDropdown').addEventListener('click', function () {
-    var badge = this.querySelector('.badge');
-    if (badge) {
-        badge.remove();
-    }
-});
+
 

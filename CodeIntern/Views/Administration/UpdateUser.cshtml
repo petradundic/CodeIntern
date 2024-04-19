@@ -11,13 +11,13 @@
                 <div class="card-header">
                     <h3 class="text-center">Update User Data</h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body"> 
                     <form asp-action="UpdateUser" method="post" class="form">
                         <input type="hidden" asp-for="Id" />
 
                         <div class="form-group">
-                            <label asp-for="FullName">Full Name:</label>
-                            <input asp-for="FullName" class="form-control" required>
+                            <label asp-for="UserName">Username:</label>
+                            <input asp-for="UserName" class="form-control" required>
                         </div>
 
                         <div class="form-group">

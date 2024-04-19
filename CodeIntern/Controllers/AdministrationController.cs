@@ -240,42 +240,51 @@ namespace CodeIntern.Controllers
             return View();
         }
 
-        public IActionResult UpdateUser()
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateUser(string id)
         {
-            return View();
+            UpdateUserViewModel userVm = new UpdateUserViewModel();
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
+            else
+            {
+                userVm.Id = user.Id;
+                userVm.UserName = user.UserName;
+                userVm.Email = user.Email;
+            }
+            return View(userVm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateUser(UpdateUserViewModel model)
         {
+
+            var user = await _userManager.FindByIdAsync(model.Id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByIdAsync(model.Id);
-
-                if (user == null)
-                {
-                    ModelState.AddModelError(string.Empty, "User not found.");
-                    return View("UpdateUser", model);
-                }
-
+                user.UserName = model.UserName;
                 user.Email = model.Email;
-                user.UserName = model.FullName;
-
                 var result = await _userManager.UpdateAsync(user);
-
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index"); // Redirect to a success page or your desired action.
+                    return View("UsersList"); 
                 }
 
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError("", error.Description);
                 }
             }
 
-            return View("UpdateUser", model); // If there are validation errors, redisplay the form with error messages.
+            return View(model);
         }
 
         public IActionResult Index()

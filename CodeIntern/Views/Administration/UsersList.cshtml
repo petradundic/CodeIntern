@@ -18,7 +18,9 @@
                 <td>@user.UserName</td>
                 <td>@user.Email</td>
                 <td class="d-flex">
-                    <button class="btn btn-primary edit-button mx-2">Edit</button>
+                    <a asp-controller="Administration" asp-action="UpdateUser" asp-route-id="@user.Id" class="btn btn-primary mx-2">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
 
                     <form class="deleteUserForm">
                         <button type="button" class="btn btn-danger mx-2" onclick="deleteUser('@user.Id')">
