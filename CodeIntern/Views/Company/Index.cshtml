@@ -12,12 +12,6 @@
         <div class="row pb-3">
             <div class="col-6">
             </div>
-            @*<div class="col-6 text-end">
-            @if (User.IsInRole(SD.Role_Company))
-            {
-            <a asp-controller="Company" asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create New Company </a>}
-            </div>*@
         </div>
         <div class="mb-3">
             <button id="filterButton" class="btn btn-primary" type="button">Filter</button>
@@ -29,6 +23,17 @@
                         <option>-</option>
                     </select>
                 </div>
+                @if (User.IsInRole(SD.Role_Admin))
+                { 
+                    <div class="form-group">
+                        <label for="registrationFilter">Registration status:</label>
+                        <select id="registrationFilter" class="form-select">
+                            <option value="All">All</option>
+                            <option value="Registered">Registered</option>
+                            <option value="Waiting">Waiting</option>
+                        </select>
+                    </div>
+                }
                 <button id="applyFilterButton" class="btn btn-primary" type="button">Apply Filter</button>
             </div>
             <table class="table table-bordered table-striped">
@@ -52,11 +57,9 @@
                     {
                         <tr>
                             <td>
-                               
-                                    <img src="@obj.ImageUrl" width="50%"
-                                         style="border-radius:5px ; border:1px solid #bbb9b9" />
-                                
 
+                                <img src="@obj.ImageUrl" width="50%"
+                                     style="border-radius:5px ; border:1px solid #bbb9b9" />
                             </td>
                             <td>@obj.CompanyName</td>
                             <td>
@@ -104,7 +107,10 @@
             var locationFilter = document.getElementById("locationFilter");
             var locationValue = locationFilter ? locationFilter.value : "";
 
-            window.location.href = '/Company/Filter?location=' + locationValue;
+            var registrationFilter = document.getElementById("registrationFilter");
+            var registrationValue = registrationFilter ? registrationFilter.value : "";
+
+            window.location.href = '/Company/Filter?location=' + locationValue + '&registration=' + registrationValue;
 
         });
     </script>

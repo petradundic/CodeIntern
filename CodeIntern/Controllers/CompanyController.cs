@@ -19,7 +19,7 @@ namespace CodeIntern.Controllers
         {
             _companyRepo = db;
             _webHostEnvironment = webHostEnvironment;
-            _registerModel = registerModel; 
+            _registerModel = registerModel;
         }
         public IActionResult Index(List<Company>? obj)
         {
@@ -40,13 +40,14 @@ namespace CodeIntern.Controllers
 
             return View(companiesList);
         }
+
         public IActionResult Details(int id)
         {
             Company? CompanyFromDb = _companyRepo.Get(x => x.CompanyId == id);
 
             return View(CompanyFromDb);
         }
-   
+
         public IActionResult Create()
         {
             return View();
@@ -59,9 +60,9 @@ namespace CodeIntern.Controllers
             if (file != null)
             {
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                string companyLogoPath=Path.Combine(wwwRootPath, @"images\company_logo");
+                string companyLogoPath = Path.Combine(wwwRootPath, @"images\company_logo");
 
-                using(var fileStream = new FileStream(Path.Combine(companyLogoPath, fileName), FileMode.Create))
+                using (var fileStream = new FileStream(Path.Combine(companyLogoPath, fileName), FileMode.Create))
                 {
                     file.CopyTo(fileStream);
                 }
@@ -109,10 +110,10 @@ namespace CodeIntern.Controllers
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string companyLogoPath = Path.Combine(wwwRootPath, @"images\company_logo");
 
-                    if(!string.IsNullOrEmpty(obj.ImageUrl)) 
+                    if (!string.IsNullOrEmpty(obj.ImageUrl))
                     {
                         var oldImageUrl = Path.Combine(wwwRootPath, obj.ImageUrl.TrimStart('\\'));
-                        if(System.IO.File.Exists(oldImageUrl))
+                        if (System.IO.File.Exists(oldImageUrl))
                         {
                             System.IO.File.Delete(oldImageUrl);
                         }
@@ -163,19 +164,30 @@ namespace CodeIntern.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult Filter(string? location)
+        public IActionResult Filter(string? location, string? registration)
         {
             List<Company> companies = _companyRepo.GetAll().ToList();
-
 
             if (!string.IsNullOrEmpty(location) && location != "-")
             {
                 companies = companies.Where(x => x.City == location).ToList();
             }
 
-
+            if (!string.IsNullOrEmpty(registration))
+            {
+                if (registration == "Registered")
+                {
+                    companies = companies.Where(x => x.RegistrationRequest == false).ToList();
+                }
+                else if (registration == "Waiting")
+                {
+                    companies = companies.Where(x => x.RegistrationRequest == true).ToList();
+                }
+            }
 
             return View("Index", companies);
         }
+
+
     }
 }
