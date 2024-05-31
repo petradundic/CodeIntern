@@ -1,75 +1,69 @@
 ﻿@model Company
 
-<div class="card shadow border-0 mt-4">
-    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
-    <div class="row">
-        <div class="col-12 text-center">
-                <h2 class="text-white py-2">Create Company</h2>
+<div class="container">
+    <div class="card shadow border-0 mt-4">
+        <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h2 class="text-white py-2">Create Company</h2>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" class="row" enctype="multipart/form-data">
+                <div class="col-md-6 mx-auto">
+                    <div class="mb-3">
+                        <label asp-for="CompanyName" class="form-label"></label>
+                        <input asp-for="CompanyName" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Website" class="form-label"></label>
+                        <input asp-for="Website" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Country" class="form-label"></label>
+                        <input asp-for="Country" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="City" class="form-label"></label>
+                        <select asp-for="City" class="form-select">
+                            <option disabled selected>-Select Location-</option>
+                            @foreach (var city in SD.Cities)
+                            {
+                                <option value="@city">@city</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label"></label>
+                        <input asp-for="Address" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Industry" class="form-label"></label>
+                        <input asp-for="Industry" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <input asp-for="Description" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="ImageUrl" class="form-label"></label>
+                        <input asp-for="ImageUrl" type="file" name="file" class="form-control" />
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary form-control"><i class="bi bi-sd-card"></i> Create</button>
+                        </div>
+                        <div class="col-md-6">
+                            <a asp-controller="Company" asp-action="Index" class="btn btn-outline-primary form-control"><i class="bi bi-arrow-left"></i> Back to List</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-    </div>
-    <div class="card-body p-4">
-        <form method="post" class="row" enctype="multipart/form-data">
-            <div class="border p-3">
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="CompanyName" class="form-control border-0 shadow" />
-                    <label asp-for="CompanyName" class="ms-2"></label>
-
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Website" class="form-control border-0 shadow" />
-                    <label asp-for="Website" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Email" class="form-control border-0 shadow" />
-                    <label asp-for="Email" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Country" class="form-control border-0 shadow" />
-                    <label asp-for="Country" class="ms-2"></label>
-                </div>
-                <div class="form-floating mb-3">
-                    <select asp-for="City" class="form-select">
-                        <option disabled selected>-Select Location-</option>
-                        @foreach (var city in SD.Cities)
-                        {
-                            <option value="@city">@city</option>
-                        }
-                    </select>
-
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Address" class="form-control border-0 shadow" />
-                    <label asp-for="Address" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Industry" class="form-control border-0 shadow" />
-                    <label asp-for="Industry" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="Description" class="form-control border-0 shadow" />
-                    <label asp-for="Description" class="ms-2"></label>
-                </div>
-                <div class="form-floating py-2 col-12">
-                    <input asp-for="ImageUrl" type="file" name="file" class="form-control border-0 shadow" />
-                    <label asp-for="ImageUrl" class="ms-2"></label>
-                </div>
-               
-
-                <div class="row pt-2">
-                    <div class="col-6 col-md-3">
-                        <button type="submit" class="btn btn-primary form-control" onclick="ShowMessage('Company added successfuly!')">Create</button>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a asp-controller="Company" asp-action="Index" class="btn btn-outline-primary border  form-control">
-                            Back to List
-                        </a>
-                    </div>
-                </div>
-
-
-            </div>
-        </form>
-    </div>
 </div>
-

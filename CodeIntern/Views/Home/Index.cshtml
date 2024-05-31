@@ -3,5 +3,59 @@
 }
 
 <div class="container">
-    
+    <h1 class="text-center mt-5 mb-4">Welcome to Code Intern!</h1>
+
+    <!-- Bootstrap Carousel -->
+    <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <!-- Slide 1: Company -->
+            <div class="carousel-item active">
+                <img src="./images/company-image.jpg" class="d-block w-75 mx-auto" alt="Company">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Discover Great Companies</h5>
+                    <p>Explore various companies and their opportunities.</p>
+                    <a href="/Company" class="btn btn-primary">Explore</a>
+                </div>
+            </div>
+            <!-- Slide 2: Internship -->
+            <div class="carousel-item">
+                <img src="~/images/internship-image.jpg" class="d-block w-75 mx-auto" alt="Internship">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Find Exciting Internships</h5>
+                    <p>Browse through available internships and kickstart your career.</p>
+                    <a href="/Internship" class="btn btn-primary">Explore</a>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleSlidesOnly" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true" style="color: black;"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleSlidesOnly" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true" ></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <!-- Additional Elements -->
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><strong>About Us</strong></h5>
+                    <p class="card-text">CodeIntern is a platform that links IT companies with students pursuing internships in their areas of interest.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><strong>Contact Us</strong></h5>
+                    <p class="card-text">Have questions or need assistance? Contact our support team.<br>Our email address: <a href="mailto:codeintern@gmail.com"><strong>codeintern@gmail.com</strong></a></p>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

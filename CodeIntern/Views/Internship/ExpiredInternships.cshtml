@@ -8,112 +8,119 @@
             </div>
         </div>
     </div>
-        <div class="mb-3">
-            <button id="filterButton" class="btn btn-primary" type="button">Filter</button>
-            <div id="filterOptions" class="mt-3" style="display: none;">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="paid" value="true" id="paidFilter" />
-                    <label class="form-check-label" for="paidFilter">Paid Internship</label>
-                </div>
-                <div class="form-group">
-                    <label for="locationFilter">Location:</label>
-                    <select id="locationFilter" class="form-select">
-                        <option>-</option>
-                        @foreach (var city in SD.Cities)
-                        {
-                            <option value="@city">@city</option>
-                        }
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="positionFilter">Position:</label>
-                    <select id="positionFilter" class="form-select">
-                        <option>-</option>
-                        @foreach (var position in SD.Position)
-                        {
-                            <option value="@position">@position</option>
-                        }
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="prLanguageFilter">Prog. language:</label>
-                    <select id="prLanguageFilter" class="form-select">
-                        <option>-</option>
-                        @foreach (var prLanguage in SD.ProgLanguage)
-                        {
-                            <option value="@prLanguage">@prLanguage</option>
-                        }
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="techFilter">Technology:</label>
-                    <select id="techFilter" class="form-select">
-                        <option>-</option>
-                        @foreach (var tech in SD.Technology)
-                        {
-                            <option value="@tech">@tech</option>
-                        }
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="workPlaceFilter">Workplace:</label>
-                    <select id="workPlaceFilter" class="form-select">
-                        <option>-</option>
-                        @foreach (var workPlace in SD.WorkPlace)
-                        {
-                            <option value="@workPlace">@workPlace</option>
-                        }
-                    </select>
-                </div>
-                <button id="applyFilterButton" class="btn btn-primary" type="button">Apply Filter</button>
+    <div class="mb-3">
+        <button id="filterButton" class="btn btn-primary mb-2" type="button" ><i class="bi bi-filter"></i>Filter</button>
+        <div id="filterOptions" class="mt-3" style="display: none;">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="paid" value="true" id="paidFilter" />
+                <label class="form-check-label" for="paidFilter">Paid Internship</label>
             </div>
+            <div class="form-group">
+                <label for="locationFilter">Location:</label>
+                <select id="locationFilter" class="form-select">
+                    <option>-</option>
+                    @foreach (var city in SD.Cities)
+                    {
+                        <option value="@city">@city</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="positionFilter">Position:</label>
+                <select id="positionFilter" class="form-select">
+                    <option>-</option>
+                    @foreach (var position in SD.Position)
+                    {
+                        <option value="@position">@position</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="prLanguageFilter">Prog. language:</label>
+                <select id="prLanguageFilter" class="form-select">
+                    <option>-</option>
+                    @foreach (var prLanguage in SD.ProgLanguage)
+                    {
+                        <option value="@prLanguage">@prLanguage</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="techFilter">Technology:</label>
+                <select id="techFilter" class="form-select">
+                    <option>-</option>
+                    @foreach (var tech in SD.Technology)
+                    {
+                        <option value="@tech">@tech</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="workPlaceFilter">Workplace:</label>
+                <select id="workPlaceFilter" class="form-select">
+                    <option>-</option>
+                    @foreach (var workPlace in SD.WorkPlace)
+                    {
+                        <option value="@workPlace">@workPlace</option>
+                    }
+                </select>
+            </div>
+            <button id="applyFilterButton" class="btn btn-primary mt-2 mb-2" type="button">Apply Filter</button>
         </div>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>
-                        Title
-                    </th>
-                    <th>
-                        Internship Description
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var obj in Model)
-                {
-                    <tr>
-                        <td>@obj.Title</td>
-                        <td>
-                            @obj.Description
-                        </td>
-
-                        <td>
-                            <div class="w-75 btn-group" role="group">
-
-                                <a asp-controller="Internship" asp-action="Details" asp-route-id="@obj.InternshipId" class="btn btn-primary mx-2">
-                                    Details
-                                </a>
-                                @if (User.IsInRole(SD.Role_Company) || User.IsInRole(SD.Role_Admin))
-                                {
-                                    <a asp-controller="Internship" asp-action="Edit" asp-route-id="@obj.InternshipId" class="btn btn-primary mx-2">
-                                        <i class="bi bi-pencil-square"></i> Edit
-                                    </a>
-
-
-                                    <a asp-controller="Internship" asp-action="Delete" asp-route-id="@obj.InternshipId" class="btn btn-danger mx-2">
-                                        <i class="bi bi-trash-fill"></i> Delete
-                                    </a>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-
     </div>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>
+                    Title
+                </th>
+                <th>
+                    Company
+                </th>
+                <th>
+                    End Date
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model)
+            {
+                <tr>
+                    <td>@obj.Title</td>
+                    <td>
+                        @obj.CompanyName
+
+                    </td>
+                    <td>
+                        @obj.EndDate.Date.ToString("dd.MM.yyyy")
+
+                    </td>
+
+                    <td>
+                        <div class="w-75 btn-group" role="group">
+
+                            <a asp-controller="Internship" asp-action="Details" asp-route-id="@obj.InternshipId" class="btn btn-primary mx-2">
+                                Details
+                            </a>
+                            @if (User.IsInRole(SD.Role_Company) || User.IsInRole(SD.Role_Admin))
+                            {
+                                <a asp-controller="Internship" asp-action="Edit" asp-route-id="@obj.InternshipId" class="btn btn-primary mx-2">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+
+
+                                <a asp-controller="Internship" asp-action="Delete" asp-route-id="@obj.InternshipId" class="btn btn-danger mx-2">
+                                    <i class="bi bi-trash-fill"></i> Delete
+                                </a>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
 </div>
 
 

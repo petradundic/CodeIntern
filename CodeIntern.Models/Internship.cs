@@ -18,7 +18,9 @@ namespace CodeIntern.Models
         public string CompanyId { get; set; }
 
         [Required]
+        [Display(Name = "Company Name")]
         public string CompanyName { get; set; }
+
         [Required]
         public string Title { get; set; }
 
@@ -26,9 +28,11 @@ namespace CodeIntern.Models
         public string Description { get; set; }
 
         [Required]
+        [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
 
         [Required]
+        [Display(Name = "End Date")]
         public DateTime EndDate { get; set; }
 
         [Required]
@@ -36,24 +40,27 @@ namespace CodeIntern.Models
 
 
         [Required]
+        [Display(Name = "Is Paid")]
         public bool IsPaid { get; set; }
 
+        [Display(Name = "Pay Per Hour (eur)")]
         public decimal? PayPerHour { get; set; }
 
         [Required]
+        [Display(Name = "Number Of Opened Positions")]
         public int NumberOfOpenings { get; set; }
 
         [Required]
         public DateTime CreatedDate { get; set; }
 
         public int NumOfApplications { get; set; }
-        
         public string? Position { get; set; }
 
+        [Display(Name = "Programming Language")]
         public string? ProgLanguage { get; set; }
         public string? Technology { get; set; }
-        public string? WorkPlace { get; set;}
+        [Display(Name = "Work Place")]
+        public string? WorkPlace { get; set; }
 
     }
 }
- 

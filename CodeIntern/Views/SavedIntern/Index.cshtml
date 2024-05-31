@@ -29,7 +29,10 @@
                         Title
                     </th>
                     <th>
-                        Internship Description
+                        Company
+                    </th>
+                    <th>
+                        start Date
                     </th>
                     <th></th>
                 </tr>
@@ -40,7 +43,12 @@
                     <tr>
                         <td>@obj.Title</td>
                         <td>
-                            @obj.Description
+                            @obj.CompanyName
+
+                        </td>
+                        <td>
+                            @obj.StartDate.ToString("dd.MM.yyyy")
+
                         </td>
 
                         <td>
@@ -50,7 +58,7 @@
                                     <i class="bi bi-trash-fill"></i> Details
                                 </a>
                                 <button type="submit" class="btn btn-danger mx-2">
-                                    <i class="bi bi-trash-fill"></i> Delete
+                                    <i class="bi bi-trash-fill"></i> Remove
                                     </button>
                                 </form>
                             </div>

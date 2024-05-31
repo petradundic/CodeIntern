@@ -2,7 +2,20 @@
 @model List<IdentityUser>
 
 <h2>Users:</h2>
+<div class="mb-3">
+    <button id="filterButton" class="btn btn-primary mb-2" type="button"><i class="bi bi-filter"></i>Filter</button>
+    <div id="filterOptions" class="mt-3" style="display: none;">
 
+        <div class="form-group">
+            <label for="userFilter">Role:</label>
+            <select id="userFilter" class="form-select">
+                <option value="All">All</option>
+                <option value="Company">Company</option>
+                <option value="Student">Student</option>
+            </select>
+        </div>
+        <button id="applyFilterButton" class="btn btn-primary mt-2 mb-2" type="button">Apply Filter</button>
+    </div>
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -32,9 +45,24 @@
         }
     </tbody>
 </table>
+   
 
-<div id="edit-delete-buttons" style="display: none;">
-    <a href="#" class="btn btn-primary" id="edit-link">Edit</a>
-    <a href="#" class="btn btn-danger" id="delete-link">Delete</a>
-</div>
+<script>
+    document.getElementById("filterButton").addEventListener("click", function () {
+        var filterOptions = document.getElementById("filterOptions");
+        if (filterOptions.style.display === "none") {
+            filterOptions.style.display = "block";
+        } else {
+            filterOptions.style.display = "none";
+        }
+    });
+
+    document.getElementById("applyFilterButton").addEventListener("click", function () {
+        var userFilter = document.getElementById("userFilter");
+        var roleValue = userFilter ? userFilter.value : "";
+
+        window.location.href = '/Administration/UsersList?role=' + roleValue;
+
+    });
+</script>
 

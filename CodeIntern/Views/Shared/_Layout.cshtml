@@ -8,97 +8,94 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CodeIntern.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
 </head>
 <body>
+    <!-- Hamburger Menu Button (Open Sidebar) -->
+    @*<span class="open-btn" onclick="openNav()">&#9776;</span>*@
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="mySidebar">
+        <!-- Close Button -->
+        <a href="javascript:void(0)" class="close-btn" onclick="closeNav()">&times;</a>
+
+        <!-- Sidebar Content -->
+        <div class="sidebar-content">
+            <a href="@Url.Action("Index", "Home")"><i class="bi bi-house-door-fill"></i> Home</a>
+            <a href="@Url.Action("Index", "Company")"><i class="bi bi-building-fill"></i> Companies</a>
+            <a href="@Url.Action("Index", "Internship")"><i class="bi bi-briefcase-fill"></i> Internships</a>
+            @if (User.IsInRole(SD.Role_Student))
+            {
+                <a href="@Url.Action("Index", "SavedIntern")"><i class="bi bi-bookmark-fill"></i> Saved Interns</a>
+                <a href="@Url.Action("MyInternApplications", "InternshipApplication")"><i class="bi bi-bookmark-fill"></i> My Intern Applications</a>
+            }
+            @if (User.IsInRole(SD.Role_Admin))
+            {
+                <a href="@Url.Action("UsersList", "Administration")"><i class="bi bi-people-fill"></i> Users</a>
+            }
+        </div>
+    </div>
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CodeIntern</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Company" asp-action="Index">Companies</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Internship" asp-action="Index">Internships</a>
-                        </li>
-                        @if (User.IsInRole(SD.Role_Student))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="SavedIntern" asp-action="Index">
-                                    <i class="bi bi-bookmark"></i>
-                                </a>
-                            </li>
-                        }
+                <!-- Hamburger Menu Button (Open Sidebar) -->
+                <div class="customContainer">
+                    <span class="open-btn" onclick="openNav()">&#9776;</span>
+                    <img src="~/images/CodeInternLogo.png" alt="Image" width="140px" height="55px">
+                </div>
 
-                        @if (User.IsInRole(SD.Role_Admin))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Administration" asp-action="UsersList">Users</a>
-                            </li>
-                        }
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Administration" asp-action="ResetPassword">Reset Password</a>
-                            </li>
-                        }
-                        @if (User.IsInRole(SD.Role_Company) || User.IsInRole(SD.Role_Student))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Administration" asp-action="DeleteUser">Delete My Account</a>
-                            </li>
-                        }
-                    </ul>
-
-                    <!-- Bell icon dropdown -->
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <ul class="navbar-nav">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-white position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="bi bi-bell"></i>
-                                    @if (ViewBag.Notifications != null && ViewBag.Notifications.Count>0)
-                                    {
-                                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
-                                            @ViewBag.Notifications.Count
-                                        </span>
-                                    }
-                                </a>
-                                @if (ViewBag.Notifications != null)
+                <!-- Bell icon dropdown -->
+                @if (User.IsInRole(SD.Role_Student))
+                {
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="bi bi-bell"></i>
+                                @if (ViewBag.Notifications != null && ViewBag.Notifications.Count > 0)
                                 {
-                                    <div class="dropdown-menu" aria-labelledby="notificationsDropdown">
-                                        @foreach (var notification in ViewBag.Notifications)
-                                        {
-                                            <a class="dropdown-item" href="@Url.Action("Details", "InternshipApplication", new { id = notification.InternshipApplicationId, notificationId = notification.NotificationId })">
-                                                @notification.Text
-                                            </a>
-                                        }
-                                    </div>
+                                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                                        @ViewBag.Notifications.Count
+                                    </span>
                                 }
-                            </li>
-                        </ul>
-                    }
-                    <!-- End of Bell icon dropdown -->
+                            </a>
+                            @if (ViewBag.Notifications != null && ViewBag.Notifications.Count > 0)
+                            {
+                                <div class="dropdown-menu" aria-labelledby="notificationsDropdown">
+                                    @foreach (var notification in ViewBag.Notifications)
+                                    {
+                                        <a class="dropdown-item" href="@Url.Action("Details", "InternshipApplication", new { id = notification.InternshipApplicationId, notificationId = notification.NotificationId })">
+                                            @notification.Text
+                                        </a>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="dropdown-menu" aria-labelledby="notificationsDropdown">
+                                    <a class="dropdown-item">
+                                        No new notifications
+                                    </a>
+                                </div>
+                            }
+                        </li>
+                    </ul>
+                }
 
+
+
+                <!-- Register and Login Buttons on the Far Right -->
+                <ul class="navbar-nav ms-auto">
                     <partial name="_LoginPartial" />
                     <form class="d-flex" method="get" action="@Url.Action("Search", "Internship")">
                         <input class="form-control me-sm-2" type="search" name="searchTerm" placeholder="Search">
                         <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
                     </form>
-                </div>
+                </ul>
             </div>
         </nav>
-
     </header>
+
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -106,7 +103,7 @@
     </div>
 
     <footer class="border-top footer text-muted">
-        <div class="container">
+        <div class="text-center container">
             &copy; 2023 - CodeIntern - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
@@ -115,6 +112,14 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tiny.cloud/1/zerm7f81kkex1pa1czgz6x3koaqui5saw5cxsbg4moo8xrhk/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        function openNav() {
+            document.getElementById("mySidebar").style.width = "250px";
+        }
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+        }
+    </script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

@@ -46,3 +46,62 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+/* Custom styles for the sidebar */
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0; /* Position sidebar on the left side */
+    z-index: 3;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+    .sidebar a {
+        padding: 10px 15px;
+        text-decoration: none;
+        font-size: 18px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+    }
+
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+
+    .sidebar .close-btn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+    }
+
+/* Custom styles for the sidebar content */
+.sidebar-content {
+    padding: 16px;
+}
+
+/* Toggle button for opening and closing the sidebar */
+.open-btn {
+    /*position: fixed;*/
+    color:white;
+    top: 20px;
+    left: 20px; /* Position hamburger menu on the left side */
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 2;
+}
+.right-img {
+    height: calc(100% - 10px); /* Match the height of the navbar minus padding/margin */
+    width: auto; /* Maintain the aspect ratio */
+    margin: 5px; /* Margin around the image */
+}
+.customContainer{
+    align-items: center;
+}

@@ -1,50 +1,65 @@
 ﻿@model Company
-<h2>@Model.CompanyName</h2>
-<div>
-<div class="row">
-    <div class ="row">
-        <p>@Model.Website</p>
-    </div>
-    <div class="row">
-        <p>@Model.Email</p>
-    </div>
-    <div class="row">
-        <p>@Model.Description</p>
-    </div>
-    <div class="row">
-        <p>@Model.Country</p>
-    </div>
-    <div class="row">
-        <p>@Model.City</p>
-    </div>
-    <div class="row">
-        <p>@Model.Address</p>
-    </div>
-    <div class="row">
-        <p>@Model.Industry</p>
-    </div>
-       
-</div>
 
-<div>
-        <div class="row pt-2">
-            @if(User.IsInRole(SD.Role_Admin) && Model.RegistrationRequest==true){
-            <div class="col-6 col-md-3">
-                    <a asp-controller="Company" asp-action="RegisterCompany" asp-route-companyId="@Model.CompanyId" class="btn btn-outline-primary border  form-control">
-                        Register Company
-                    </a>
-            </div>
-            }
-            <div class="col-6 col-md-3">
-                <a asp-controller="Company" asp-action="Index" class="btn btn-outline-primary border  form-control">
-                    Back to List
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Internship" asp-action="Index" asp-route-companyName="@Model.CompanyName" class="btn btn-outline-primary border  form-control">
-                    Opened Internship Positions
-                </a>
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <a asp-controller="Company" asp-action="Index" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
         </div>
-</div>
+    </div>
+
+    <div class="row mt-3 justify-content-center">
+        <div class="col-md-6 border p-3">
+            <h2 class="text-center mb-3">@Model.CompanyName</h2>
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th scope="row">Website</th>
+                        <td><a href="@Model.Website">@Model.Website</a></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Email</th>
+                        <td>@Model.Email</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Description</th>
+                        <td>@Model.Description</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Country</th>
+                        <td>@Model.Country</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">City</th>
+                        <td>@Model.City</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Address</th>
+                        <td>@Model.Address</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Industry</th>
+                        <td>@Model.Industry</td>
+                    </tr>
+                </tbody>
+            </table>
+            @if (User.IsInRole(SD.Role_Admin) && Model.RegistrationRequest==true)
+            {
+                <div class="mt-3">
+                    <a asp-controller="Company" asp-action="RegisterCompany" asp-route-companyId="@Model.CompanyId" class="btn btn-primary">
+                        <i class="bi bi-plus"></i> Register Company
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row mt-3 justify-content-center">
+        <div class="col-md-6">
+            <a asp-controller="Internship" asp-action="Index" asp-route-companyId="@Model.CompanyId" class="btn btn-primary">
+                <i class="bi bi-briefcase"></i> Opened Internship Positions
+            </a>
+        </div>
+    </div>
 </div>

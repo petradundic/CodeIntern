@@ -39,6 +39,13 @@ namespace CodeIntern.Controllers
             }
             return View(applications);
         }
+
+        public IActionResult MyInternApplications()
+        {
+            var userId = _userManager.GetUserId(User);
+            return RedirectToAction("Index", new { studentId = userId });
+        }
+
         [Authorize(Roles = "Admin, Company, Student")]
         public IActionResult Details(int id, int notificationId)
         {

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using CodeIntern.Areas.Identity.Pages.Account;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Identity;
 
 namespace CodeIntern.Controllers
 {
@@ -15,11 +16,13 @@ namespace CodeIntern.Controllers
         private readonly ICompanyRepository _companyRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly RegisterModel _registerModel;
-        public CompanyController(ICompanyRepository db, IWebHostEnvironment webHostEnvironment, RegisterModel registerModel)
+        private readonly UserManager<IdentityUser> _userManager;
+        public CompanyController(ICompanyRepository db, IWebHostEnvironment webHostEnvironment, RegisterModel registerModel, UserManager<IdentityUser> userManager)
         {
             _companyRepo = db;
             _webHostEnvironment = webHostEnvironment;
             _registerModel = registerModel;
+            _userManager = userManager;
         }
         public IActionResult Index(List<Company>? obj)
         {
@@ -82,22 +85,38 @@ namespace CodeIntern.Controllers
             return result;
         }
 
-        public IActionResult Edit(int? id)
+        [Authorize(Roles = "Admin,Company")]
+        public async Task<IActionResult> Edit(int? id, string? companyUserId)
         {
-            if (id == null || id == 0)
+            if (id == null && string.IsNullOrEmpty(companyUserId))
             {
                 return NotFound();
             }
-            //Company? CompanyFromDb = _unitOfWork.Company.Get(u => u.Id == id);
-            Company? CompanyFromDb1 = _companyRepo.Get(u => u.CompanyId == id);
-            //Company? CompanyFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
 
-            if (CompanyFromDb1 == null)
+            Company company = null;
+
+            if (!string.IsNullOrEmpty(companyUserId))
+            {
+                var user = await _userManager.FindByIdAsync(companyUserId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                company = _companyRepo.Get(u => u.Email == user.Email);
+            }
+            else if (id.HasValue)
+            {
+                company = _companyRepo.Get(u => u.CompanyId == id.Value);
+            }
+
+            if (company == null)
             {
                 return NotFound();
             }
-            return View(CompanyFromDb1);
+
+            return View(company);
         }
+
         [HttpPost]
         [Authorize(Roles = "Admin,Company")]
         public IActionResult Edit(Company obj, IFormFile? file)
@@ -140,13 +159,13 @@ namespace CodeIntern.Controllers
             {
                 return NotFound();
             }
-            Company? CompanyFromDb = _companyRepo.Get(x => x.CompanyId == id);
+            Company? company = _companyRepo.Get(x => x.CompanyId == id);
 
-            if (CompanyFromDb == null)
+            if (company == null)
             {
                 return NotFound();
             }
-            return View(CompanyFromDb);
+            return View(company);
         }
 
         [HttpPost, ActionName("Delete")]

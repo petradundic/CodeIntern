@@ -23,14 +23,33 @@ namespace CodeIntern.Controllers
             _userManager = userManager;
             _savedInternRepo = savedInternRepo;
             _internshipRepo = internshipRepository;
-            _internApplicationRepo = internApplicationRepo; 
+            _internApplicationRepo = internApplicationRepo;
         }
-        public IActionResult Index(string? companyName, List<Internship>? obj )
+        public IActionResult Index(string? companyId, List<Internship>? obj)
         {
-            IEnumerable<SelectListItem> technologies = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.Technology, Value = x.Technology }).Distinct().OrderBy(tech => tech);
-            IEnumerable<SelectListItem> positions = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.Position, Value = x.Position }).Distinct().OrderBy(pos => pos);
-            IEnumerable<SelectListItem> progLanguages = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.ProgLanguage, Value = x.ProgLanguage }).Distinct().OrderBy(lang => lang);
-            IEnumerable<SelectListItem> locations = _internshipRepo.GetAll().Select(x => new SelectListItem { Text = x.Location, Value = x.Location }).Distinct().OrderBy(loc => loc);
+            IEnumerable<SelectListItem> technologies = _internshipRepo.GetAll()
+            .Where(x => x.Technology != null)
+            .Select(x => new SelectListItem { Text = x.Technology, Value = x.Technology })
+            .DistinctBy(x => x.Text)
+             .OrderBy(tech => tech.Text);
+
+            IEnumerable<SelectListItem> positions = _internshipRepo.GetAll()
+                .Where(x => x.Position != null)
+                .Select(x => new SelectListItem { Text = x.Position, Value = x.Position })
+                .DistinctBy(x => x.Text)
+                .OrderBy(pos => pos.Text);
+
+            IEnumerable<SelectListItem> progLanguages = _internshipRepo.GetAll()
+                .Where(x => x.ProgLanguage != null)
+                .Select(x => new SelectListItem { Text = x.ProgLanguage, Value = x.ProgLanguage })
+                .DistinctBy(x => x.Text)
+                .OrderBy(lang => lang.Text);
+
+            IEnumerable<SelectListItem> locations = _internshipRepo.GetAll()
+                .Where(x => x.Location != null)
+                .Select(x => new SelectListItem { Text = x.Location, Value = x.Location })
+                .DistinctBy(x => x.Text)
+                .OrderBy(loc => loc.Text);
 
             ViewBag.Technologies = technologies;
             ViewBag.Positions = positions;
@@ -42,9 +61,9 @@ namespace CodeIntern.Controllers
                 return View(obj);
             }
             List<Internship> internshipsList = _internshipRepo.GetAll().ToList();
-            if (!string.IsNullOrEmpty(companyName))
+            if (!string.IsNullOrEmpty(companyId))
             {
-                internshipsList = _internshipRepo.GetAll(x=>x.CompanyName==companyName).ToList();
+                internshipsList = _internshipRepo.GetAll(x => x.CompanyId == companyId).ToList();
             }
             return View(internshipsList);
         }
@@ -54,7 +73,7 @@ namespace CodeIntern.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            List<Internship> InternshipsList = _internshipRepo.GetAll(x=>x.StartDate < DateTime.Now && x.CompanyId== userId).ToList();
+            List<Internship> InternshipsList = _internshipRepo.GetAll(x => x.EndDate < DateTime.Now && x.CompanyId == userId).ToList();
             if (InternshipsList != null && InternshipsList.Count > 0)
             {
                 return View(InternshipsList);
@@ -68,13 +87,13 @@ namespace CodeIntern.Controllers
             var userId = _userManager.GetUserId(User);
             ViewBag.UserId = userId;
 
-            InternshipApplication? internApp= _internApplicationRepo.Get(x=>x.InternshipId==id && x.StudentId==userId);
+            InternshipApplication? internApp = _internApplicationRepo.Get(x => x.InternshipId == id && x.StudentId == userId);
             SavedInternship? savedInternship = _savedInternRepo.Get(x => x.InternshipId == id && x.StudentId == userId);
             ViewBag.HasApplied = internApp != null;
             ViewBag.InternshipApplicationId = internApp?.InternshipApplicationId;
             ViewBag.IsSaved = savedInternship != null;
 
-            
+
             return View(InternshipFromDb);
         }
 
@@ -98,7 +117,7 @@ namespace CodeIntern.Controllers
         {
             return View();
         }
-        
+
         [HttpPost]
         [Authorize(Roles = "Admin,Company")]
         public IActionResult Create(Internship obj)
@@ -132,19 +151,23 @@ namespace CodeIntern.Controllers
             return View(InternshipFromDb1);
         }
 
-        
+
         [HttpPost]
         [Authorize(Roles = "Admin,Company")]
         public IActionResult Edit(Internship obj)
         {
             if (ModelState.IsValid)
             {
+                var startDate = obj.StartDate.Date;
+                var endDate = obj.EndDate.Date;
+                obj.StartDate = startDate;
+                obj.EndDate = endDate;
                 _internshipRepo.Update(obj);
                 _internshipRepo.Save();
                 return RedirectToAction("Index");
             }
             return View();
-             
+
         }
         [Authorize(Roles = "Admin,Company")]
         public IActionResult Delete(int? id)
@@ -188,7 +211,7 @@ namespace CodeIntern.Controllers
                 internships = _internshipRepo.GetAll().ToList();
             }
 
-            if (!string.IsNullOrEmpty(location) && location!="-")
+            if (!string.IsNullOrEmpty(location) && location != "-")
             {
                 internships = internships.Where(x => x.Location == location).ToList();
             }
@@ -213,7 +236,7 @@ namespace CodeIntern.Controllers
                 internships = internships.Where(x => x.WorkPlace == workPlace).ToList();
             }
 
-            return View("Index",internships);
+            return View("Index", internships);
         }
 
         public IActionResult Search(string searchTerm)

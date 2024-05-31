@@ -251,7 +251,6 @@ namespace CodeIntern.Controllers
             else
             {
                 userVm.Id = user.Id;
-                userVm.UserName = user.UserName;
                 userVm.Email = user.Email;
             }
             return View(userVm);
@@ -263,6 +262,9 @@ namespace CodeIntern.Controllers
         {
 
             var user = await _userManager.FindByIdAsync(model.Id);
+            bool isCompany = await _userManager.IsInRoleAsync(user, SD.Role_Company);
+
+
             if (user == null)
             {
                 return NotFound();
@@ -270,14 +272,25 @@ namespace CodeIntern.Controllers
 
             if (ModelState.IsValid)
             {
-                user.UserName = model.UserName;
+                if (isCompany)
+                {
+                    Company company = _companyRepository.Get(u => u.Email == user.Email);
+                    company.Email = model.Email;
+                    _companyRepository.Update(company);
+                    _companyRepository.Save();
+                }
                 user.Email = model.Email;
                 var result = await _userManager.UpdateAsync(user);
-                if (result.Succeeded)
+
+                if (result.Succeeded && User.IsInRole(SD.Role_Admin))
                 {
-                    return View("UsersList"); 
+                    return View("UsersList");
                 }
 
+                if (result.Succeeded && !User.IsInRole(SD.Role_Admin))
+                {
+                    RedirectToAction("Index", "Home");
+                }
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError("", error.Description);
@@ -291,10 +304,23 @@ namespace CodeIntern.Controllers
         {
             return View();
         }
-
-        public IActionResult UsersList()
+        public async Task<IActionResult> UsersList(string? role)
         {
-            var users = _userManager.Users.ToList();
+            var users = _userManager.Users.OrderBy(x => x.UserName).ToList();
+            var userRoles = new Dictionary<string, IList<string>>();
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userRoles[user.Id] = roles;
+            }
+
+            if (!string.IsNullOrEmpty(role))
+            {
+                if (role != "All")
+                    users = users.Where(u => userRoles[u.Id].Contains(role)).OrderBy(x => x.UserName).ToList();
+            }
+
+
             return View(users);
         }
 
