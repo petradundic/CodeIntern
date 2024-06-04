@@ -62,6 +62,14 @@
                             </form>
                         </div>
                     }
+                    @if (!ViewBag.IsSaved)
+                    {
+                        <div class="col-6 col-md-3">
+                            <a asp-controller="Internship" asp-action="SaveInternship" asp-route-id="@Model.InternshipId" class="btn btn-outline-primary border form-control">
+                                <i class="bi bi-heart"></i> Save
+                            </a>
+                        </div>
+                    }
                 }
 
                 @if (!User.IsInRole(SD.Role_Student) && Model.NumOfApplications > 0 && Model.CompanyId == ViewBag.UserId)
@@ -72,14 +80,7 @@
                         </a>
                     </div>
                 }
-                @if (!ViewBag.IsSaved)
-                {
-                    <div class="col-6 col-md-3">
-                        <a asp-controller="Internship" asp-action="SaveInternship" asp-route-id="@Model.InternshipId" class="btn btn-outline-primary border form-control">
-                            <i class="bi bi-heart"></i> Save
-                        </a>
-                    </div>
-                }
+
             </div>
         </div>
     </div>

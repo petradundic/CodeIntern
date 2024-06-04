@@ -40,9 +40,25 @@ namespace CodeIntern.DataAccess.Repository
             return query.ToList();
         }
 
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await dbSet.Where(predicate).ToListAsync();
+        }
+
+        public async Task<T?> GetAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await dbSet.FirstOrDefaultAsync(predicate);
+        }
+
         public void Remove(T entity)
         {
             dbSet.Remove(entity);
+        }
+
+        public async Task RemoveAsync(T entity)
+        {
+            dbSet.Remove(entity);
+            await _db.SaveChangesAsync();
         }
 
         public void RemoveRange(IEnumerable<T> entity)
@@ -56,5 +72,9 @@ namespace CodeIntern.DataAccess.Repository
             await _db.SaveChangesAsync();
         }
 
+        public async Task SaveAsync()
+        {
+            await _db.SaveChangesAsync();
+        }
     }
 }

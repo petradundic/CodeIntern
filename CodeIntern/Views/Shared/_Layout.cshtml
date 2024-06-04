@@ -25,7 +25,7 @@
             <a href="@Url.Action("Index", "Internship")"><i class="bi bi-briefcase-fill"></i> Internships</a>
             @if (User.IsInRole(SD.Role_Student))
             {
-                <a href="@Url.Action("Index", "SavedIntern")"><i class="bi bi-bookmark-fill"></i> Saved Interns</a>
+                <a href="@Url.Action("Index", "SavedIntern")"><i class="bi bi-heart"></i> Saved Interns</a>
                 <a href="@Url.Action("MyInternApplications", "InternshipApplication")"><i class="bi bi-bookmark-fill"></i> My Intern Applications</a>
             }
             @if (User.IsInRole(SD.Role_Admin))

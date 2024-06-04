@@ -42,7 +42,6 @@ namespace CodeIntern.Controllers
         [Authorize(Roles = "Admin,Student,Company")]
         public async Task<IActionResult> DeleteUser(string? id)
         {
-            //vidi jel bolje obrisat iz AspUsers prije ili nakon cilog procesa
             var currentUserId = _userManager.GetUserId(User);
             var user = await _userManager.FindByIdAsync(currentUserId);
 
@@ -174,19 +173,16 @@ namespace CodeIntern.Controllers
                                     user.PasswordHash = newPasswordHash;
                                 }
 
-                                // Save changes to the user
                                 var result = await _userManager.UpdateAsync(user);
 
                                 if (result.Succeeded)
                                 {
-                                    // Optionally, sign the user out and back in to refresh the authentication cookie
                                     await _signInManager.SignOutAsync();
                                     await _signInManager.SignInAsync(user, isPersistent: false);
 
-                                    return RedirectToAction("Index", "Home"); // Redirect to a success page
+                                    return RedirectToAction("Index", "Home"); 
                                 }
 
-                                // Handle errors here if the update fails
                                 foreach (var error in result.Errors)
                                 {
                                     ModelState.AddModelError(string.Empty, error.Description);
@@ -217,7 +213,6 @@ namespace CodeIntern.Controllers
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
                     return RedirectToAction(nameof(ForgotPasswordConfirmation));
                 }
 
@@ -228,7 +223,6 @@ namespace CodeIntern.Controllers
                 return RedirectToAction(nameof(ForgotPasswordConfirmation));
             }
 
-            // If we got this far, something failed; redisplay the form.
             return View(model);
         }
 

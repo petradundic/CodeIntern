@@ -51,7 +51,6 @@ namespace CodeIntern.Controllers
                 {
                     return RedirectToAction("Index", "Internship", results);
                 }
-                //dodat results not found
             }
 
             return View("Index");

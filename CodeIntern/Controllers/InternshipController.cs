@@ -17,16 +17,39 @@ namespace CodeIntern.Controllers
         private readonly IInternshipRepository _internshipRepo;
         private readonly ISavedInternRepository _savedInternRepo;
         private readonly IInternApplicationRepository _internApplicationRepo;
+        private INotificationRepository _notificationRepository;
         private readonly UserManager<IdentityUser> _userManager;
-        public InternshipController(UserManager<IdentityUser> userManager, ISavedInternRepository savedInternRepo, IInternshipRepository internshipRepository, IInternApplicationRepository internApplicationRepo)
+        public InternshipController(UserManager<IdentityUser> userManager, ISavedInternRepository savedInternRepo, IInternshipRepository internshipRepository, IInternApplicationRepository internApplicationRepo, INotificationRepository notificationRepository)
         {
             _userManager = userManager;
             _savedInternRepo = savedInternRepo;
             _internshipRepo = internshipRepository;
             _internApplicationRepo = internApplicationRepo;
+            _notificationRepository = notificationRepository;
         }
         public IActionResult Index(string? companyId, List<Internship>? obj)
         {
+            List<Internship> internshipsList = _internshipRepo.GetAll().ToList();
+            //List<string> tempLocations = new List<string>();
+
+            //foreach (var intern in internshipsList)
+            //{
+            //    foreach (var loc in intern.Location)
+            //    {
+            //        tempLocations.Add(loc);
+            //    }
+            //}
+
+            //IEnumerable<SelectListItem> locations = tempLocations
+            //.Distinct()
+            //.Select(loc => new SelectListItem { Text = loc, Value = loc })
+            //.OrderBy(loc => loc.Text);
+            IEnumerable<SelectListItem> locations = _internshipRepo.GetAll()
+                .Where(x => x.Location != null)
+                .Select(x => new SelectListItem { Text = x.Location, Value = x.Location })
+                .DistinctBy(x => x.Text)
+                .OrderBy(loc => loc.Text);
+
             IEnumerable<SelectListItem> technologies = _internshipRepo.GetAll()
             .Where(x => x.Technology != null)
             .Select(x => new SelectListItem { Text = x.Technology, Value = x.Technology })
@@ -45,12 +68,6 @@ namespace CodeIntern.Controllers
                 .DistinctBy(x => x.Text)
                 .OrderBy(lang => lang.Text);
 
-            IEnumerable<SelectListItem> locations = _internshipRepo.GetAll()
-                .Where(x => x.Location != null)
-                .Select(x => new SelectListItem { Text = x.Location, Value = x.Location })
-                .DistinctBy(x => x.Text)
-                .OrderBy(loc => loc.Text);
-
             ViewBag.Technologies = technologies;
             ViewBag.Positions = positions;
             ViewBag.ProgramLanguages = progLanguages;
@@ -60,7 +77,9 @@ namespace CodeIntern.Controllers
             {
                 return View(obj);
             }
-            List<Internship> internshipsList = _internshipRepo.GetAll().ToList();
+
+            internshipsList = _internshipRepo.GetAll(x => x.StartDate >= DateTime.Now).ToList();
+
             if (!string.IsNullOrEmpty(companyId))
             {
                 internshipsList = _internshipRepo.GetAll(x => x.CompanyId == companyId).ToList();
@@ -73,7 +92,7 @@ namespace CodeIntern.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            List<Internship> InternshipsList = _internshipRepo.GetAll(x => x.EndDate < DateTime.Now && x.CompanyId == userId).ToList();
+            List<Internship> InternshipsList = _internshipRepo.GetAll(x => x.StartDate < DateTime.Now && x.CompanyId == userId).ToList();
             if (InternshipsList != null && InternshipsList.Count > 0)
             {
                 return View(InternshipsList);
@@ -83,7 +102,7 @@ namespace CodeIntern.Controllers
         }
         public IActionResult Details(int id)
         {
-            Internship? InternshipFromDb = _internshipRepo.Get(x => x.InternshipId == id);
+            Internship? internshipFromDb = _internshipRepo.Get(x => x.InternshipId == id);
             var userId = _userManager.GetUserId(User);
             ViewBag.UserId = userId;
 
@@ -94,7 +113,7 @@ namespace CodeIntern.Controllers
             ViewBag.IsSaved = savedInternship != null;
 
 
-            return View(InternshipFromDb);
+            return View(internshipFromDb);
         }
 
         [Authorize(Roles = "Student")]
@@ -186,17 +205,48 @@ namespace CodeIntern.Controllers
         }
         [HttpPost, ActionName("Delete")]
         [Authorize(Roles = "Admin,Company")]
-        public IActionResult DeletePOST(int? id)
+        public async Task<IActionResult> DeletePOST(int? id)
         {
-            Internship? obj = _internshipRepo.Get(x => x.InternshipId == id); ;
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Internship? obj = await _internshipRepo.GetAsync(x => x.InternshipId == id);
             if (obj == null)
             {
                 return NotFound();
             }
-            _internshipRepo.Remove(obj);
-            _internshipRepo.Save();
+            else
+            {
+                List<SavedInternship> savedInternships = (await _savedInternRepo.GetAllAsync(x => x.InternshipId == obj.InternshipId)).ToList();
+                if (savedInternships.Any())
+                {
+                    await _savedInternRepo.RemoveRangeAsync(savedInternships);
+                }
+
+                List<InternshipApplication> internshipApplications = (await _internApplicationRepo.GetAllAsync(x => x.InternshipId == obj.InternshipId)).ToList();
+                if (internshipApplications.Any())
+                {
+                    foreach (InternshipApplication application in internshipApplications)
+                    {
+                        List<Notification> notifications = (await _notificationRepository.GetAllAsync(x => x.InternshipApplicationId == application.InternshipApplicationId)).ToList();
+                        if (notifications.Any())
+                        {
+                            await _notificationRepository.RemoveRangeAsync(notifications);
+                        }
+                    }
+
+                    await _internApplicationRepo.RemoveRangeAsync(internshipApplications);
+                }
+            }
+
+            await _internshipRepo.RemoveAsync(obj);
+            await _internshipRepo.SaveAsync();
+
             return RedirectToAction("Index");
         }
+
 
         public IActionResult Filter(bool? paid, string? location, string? position, string? technology, string? language, string? workPlace)
         {
@@ -213,7 +263,8 @@ namespace CodeIntern.Controllers
 
             if (!string.IsNullOrEmpty(location) && location != "-")
             {
-                internships = internships.Where(x => x.Location == location).ToList();
+               // internships = internships.Where(x => x.Location.Contains(location)).ToList();
+                internships = internships.Where(x => x.Location==location).ToList();
             }
 
             if (!string.IsNullOrEmpty(position) && position != "-")
