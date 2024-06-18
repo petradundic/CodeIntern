@@ -30,8 +30,8 @@ namespace CodeIntern.Models
         public string? Status { get; set; }
 
         public string? InternshipTitle { get; set;}
+        public string? FileExtension { get; set; }
 
 
-        
     }
 }

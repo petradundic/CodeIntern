@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Data;
 
 namespace CodeIntern.Controllers
@@ -30,29 +31,21 @@ namespace CodeIntern.Controllers
         public IActionResult Index(string? companyId, List<Internship>? obj)
         {
             List<Internship> internshipsList = _internshipRepo.GetAll().ToList();
-            //List<string> tempLocations = new List<string>();
 
-            //foreach (var intern in internshipsList)
-            //{
-            //    foreach (var loc in intern.Location)
-            //    {
-            //        tempLocations.Add(loc);
-            //    }
-            //}
 
-            //IEnumerable<SelectListItem> locations = tempLocations
-            //.Distinct()
-            //.Select(loc => new SelectListItem { Text = loc, Value = loc })
-            //.OrderBy(loc => loc.Text);
-            IEnumerable<SelectListItem> locations = _internshipRepo.GetAll()
-                .Where(x => x.Location != null)
-                .Select(x => new SelectListItem { Text = x.Location, Value = x.Location })
-                .DistinctBy(x => x.Text)
-                .OrderBy(loc => loc.Text);
+            string tempLoc = String.Empty;
+            string tempProgLang = String.Empty;
+            string tempTech = String.Empty;
 
-            IEnumerable<SelectListItem> technologies = _internshipRepo.GetAll()
-            .Where(x => x.Technology != null)
-            .Select(x => new SelectListItem { Text = x.Technology, Value = x.Technology })
+            foreach (var item in internshipsList)
+            {
+                tempLoc += item.Location;
+                tempProgLang += item.ProgLanguage;
+                tempTech += item.Technology;
+            }
+
+            IEnumerable<SelectListItem> technologies = tempTech.Split(", ").ToList()
+            .Select(x => new SelectListItem { Text = x, Value = x })
             .DistinctBy(x => x.Text)
              .OrderBy(tech => tech.Text);
 
@@ -62,9 +55,13 @@ namespace CodeIntern.Controllers
                 .DistinctBy(x => x.Text)
                 .OrderBy(pos => pos.Text);
 
-            IEnumerable<SelectListItem> progLanguages = _internshipRepo.GetAll()
-                .Where(x => x.ProgLanguage != null)
-                .Select(x => new SelectListItem { Text = x.ProgLanguage, Value = x.ProgLanguage })
+            IEnumerable<SelectListItem> progLanguages = tempProgLang.Split(", ").ToList()
+                .Select(x => new SelectListItem { Text = x, Value = x })
+                .DistinctBy(x => x.Text)
+                .OrderBy(lang => lang.Text);
+
+            IEnumerable<SelectListItem> locations = tempLoc.Split(", ").ToList()
+                .Select(x => new SelectListItem { Text = x, Value = x })
                 .DistinctBy(x => x.Text)
                 .OrderBy(lang => lang.Text);
 
@@ -134,25 +131,60 @@ namespace CodeIntern.Controllers
         [Authorize(Roles = "Admin,Company")]
         public IActionResult Create()
         {
-            return View();
+            InternshipViewModel vm = new InternshipViewModel();
+            var userId = _userManager.GetUserId(User);
+            vm.CompanyId = userId;
+            vm.StartDate = DateTime.Now.Date;
+            vm.EndDate = DateTime.Now.Date;
+            return View(vm);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin,Company")]
-        public IActionResult Create(Internship obj)
+        public IActionResult Create(InternshipViewModel obj)
         {
-            //dodaj uvjet i validaciju za start date da ne bude ranije od kreiranog i da bude 7 dana od kreiranja
             var userId = _userManager.GetUserId(User);
-            obj.CompanyId = userId;
-            obj.CreatedDate = DateTime.Now;
-            var startDate = obj.StartDate.Date;
-            var endDate = obj.EndDate.Date;
-            obj.StartDate = startDate;
-            obj.EndDate = endDate;
-            _internshipRepo.Add(obj);
+            var currentDate = DateTime.Now;
+            if (obj.StartDate < currentDate || obj.StartDate < currentDate.AddDays(7))
+            {
+                ModelState.AddModelError("StartDate", "Start date must be at least 7 days from today and not earlier than today.");
+            }
+
+            if (obj.EndDate < obj.StartDate)
+            {
+                ModelState.AddModelError("EndDate", "End date must be after the start date.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(obj);
+            }
+
+            Internship internship = new Internship
+            {
+                CompanyId = userId,
+                CreatedDate = currentDate,
+                StartDate = obj.StartDate.Date,
+                EndDate = obj.EndDate.Date,
+                IsPaid = obj.IsPaid,
+                PayPerHour = obj.PayPerHour,
+                Position = obj.Position,
+                CompanyName = obj.CompanyName,
+                Title = obj.Title,
+                Description = obj.Description,
+                NumberOfOpenings = obj.NumberOfOpenings,
+                WorkPlace = obj.WorkPlace,
+                ProgLanguage = obj.ProgLanguage != null ? string.Join(", ", obj.ProgLanguage) : string.Empty,
+                Location = obj.Location != null ? string.Join(", ", obj.Location) : string.Empty,
+                Technology = obj.Technology != null ? string.Join(", ", obj.Technology) : string.Empty
+            };
+
+            _internshipRepo.Add(internship);
             _internshipRepo.Save();
+
             return RedirectToAction("Index");
         }
+
 
         [Authorize(Roles = "Admin,Company")]
         public IActionResult Edit(int? id)
@@ -161,27 +193,81 @@ namespace CodeIntern.Controllers
             {
                 return NotFound();
             }
-            Internship? InternshipFromDb1 = _internshipRepo.Get(x => x.InternshipId == id); ;
 
-            if (InternshipFromDb1 == null)
+            Internship internshipFromDb = _internshipRepo.Get(x => x.InternshipId == id);
+
+            if (internshipFromDb == null)
             {
                 return NotFound();
             }
-            return View(InternshipFromDb1);
+
+            InternshipViewModel internshipViewModel = new InternshipViewModel
+            {
+                InternshipId = internshipFromDb.InternshipId,
+                CompanyId = internshipFromDb.CompanyId,
+                CreatedDate = internshipFromDb.CreatedDate,
+                StartDate = internshipFromDb.StartDate,
+                EndDate = internshipFromDb.EndDate,
+                IsPaid = internshipFromDb.IsPaid,
+                PayPerHour = internshipFromDb.PayPerHour,
+                Position = internshipFromDb.Position,
+                CompanyName = internshipFromDb.CompanyName,
+                Title = internshipFromDb.Title,
+                Description = internshipFromDb.Description,
+                NumberOfOpenings = internshipFromDb.NumberOfOpenings,
+                WorkPlace = internshipFromDb.WorkPlace,
+                ProgLanguage = internshipFromDb.ProgLanguage?.Split(", ").ToList(),
+                Location = internshipFromDb.Location?.Split(", ").ToList(),
+                Technology = internshipFromDb.Technology?.Split(", ").ToList()
+            };
+
+            return View(internshipViewModel);
         }
 
 
         [HttpPost]
         [Authorize(Roles = "Admin,Company")]
-        public IActionResult Edit(Internship obj)
+        public IActionResult Edit(InternshipViewModel obj)
         {
+            var currentDate = DateTime.Now;
+            if (obj.StartDate < currentDate || obj.StartDate < currentDate.AddDays(7))
+            {
+                ModelState.AddModelError("StartDate", "Start date must be at least 7 days from today and not earlier than today.");
+            }
+
+            if (obj.EndDate < obj.StartDate)
+            {
+                ModelState.AddModelError("EndDate", "End date must be after the start date.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(obj);
+            }
+
             if (ModelState.IsValid)
             {
-                var startDate = obj.StartDate.Date;
-                var endDate = obj.EndDate.Date;
-                obj.StartDate = startDate;
-                obj.EndDate = endDate;
-                _internshipRepo.Update(obj);
+                var userId = _userManager.GetUserId(User);
+                Internship internship = new Internship
+                {
+                    InternshipId = obj.InternshipId,
+                    CompanyId = userId,
+                    CreatedDate = currentDate,
+                    StartDate = obj.StartDate.Date,
+                    EndDate = obj.EndDate.Date,
+                    IsPaid = obj.IsPaid,
+                    PayPerHour = obj.PayPerHour,
+                    Position = obj.Position,
+                    CompanyName = obj.CompanyName,
+                    Title = obj.Title,
+                    Description = obj.Description,
+                    NumberOfOpenings = obj.NumberOfOpenings,
+                    WorkPlace = obj.WorkPlace,
+                    ProgLanguage = obj.ProgLanguage != null ? string.Join(", ", obj.ProgLanguage) : string.Empty,
+                    Location = obj.Location != null ? string.Join(", ", obj.Location) : string.Empty,
+                    Technology = obj.Technology != null ? string.Join(", ", obj.Technology) : string.Empty
+                };
+                _internshipRepo.Update(internship);
                 _internshipRepo.Save();
                 return RedirectToAction("Index");
             }
@@ -263,8 +349,7 @@ namespace CodeIntern.Controllers
 
             if (!string.IsNullOrEmpty(location) && location != "-")
             {
-               // internships = internships.Where(x => x.Location.Contains(location)).ToList();
-                internships = internships.Where(x => x.Location==location).ToList();
+                internships = internships.Where(x => x.Location.Contains(location)).ToList();
             }
 
             if (!string.IsNullOrEmpty(position) && position != "-")
@@ -274,12 +359,12 @@ namespace CodeIntern.Controllers
 
             if (!string.IsNullOrEmpty(technology) && technology != "-")
             {
-                internships = internships.Where(x => x.Technology == technology).ToList();
+                internships = internships.Where(x => x.Technology.Contains(technology)).ToList();
             }
 
             if (!string.IsNullOrEmpty(language) && language != "-")
             {
-                internships = internships.Where(x => x.ProgLanguage == language).ToList();
+                internships = internships.Where(x => x.ProgLanguage.Contains(language)).ToList();
             }
 
             if (!string.IsNullOrEmpty(workPlace) && workPlace != "-")

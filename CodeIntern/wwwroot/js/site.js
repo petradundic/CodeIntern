@@ -29,6 +29,18 @@ function deleteUser(id) {
         var url = '/Administration/DeleteUser/' + id;
     Delete(url, 'Are you sure you want to delete this user?','User deleted successfully!');
 }
+function updateInternship(id) {
+    var url = '/Internship/Edit/' + id;
+    handleRequest(url, 'POST', '', 'Internship updated!', 'Something went wrong!', false)
+}
+function createInternship() {
+    var url = '/Internship/Create';
+    handleRequest(url, 'POST', '', 'Internship created!', 'Something went wrong!', false)
+}
+function updateCompany(id) {
+    var url = '/Company/Edit/' + id;
+    handleRequest(url, 'POST', '', 'Company info updated!', 'Something went wrong!', false)
+}
 
 function Delete(url, message1, message2) {
     Swal.fire({
@@ -65,6 +77,46 @@ function Delete(url, message1, message2) {
         }
     });
 }
+
+function handleRequest(url, method, confirmMessage, successMessage, errorMessage, requireConfirmation = false) {
+    const executeRequest = () => {
+        $.ajax({
+            url: url,
+            type: method,
+            success: function () {
+                Swal.fire({
+                    text: successMessage,
+                    icon: "success"
+                });
+            },
+            error: function () {
+                Swal.fire({
+                    text: errorMessage,
+                    icon: "error"
+                });
+            }
+        });
+    };
+
+    if (requireConfirmation) {
+        Swal.fire({
+            title: confirmMessage,
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                executeRequest();
+            }
+        });
+    } else {
+        executeRequest();
+    }
+}
+
 
 
 

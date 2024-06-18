@@ -1,4 +1,4 @@
-﻿@model CodeIntern.Models.Internship
+﻿@model CodeIntern.Models.InternshipViewModel
 
 <div class="card shadow border-0 mt-4">
     <div class="card-header bg-secondary bg-gradient ml-0 py-3">
@@ -10,6 +10,7 @@
     </div>
     <div class="card-body p-4">
         <form method="post" class="row">
+            <input asp-for="CompanyId" hidden />
             <div class="border p-3">
                 <div class="form-floating py-2 col-12">
                     <input asp-for="CompanyName" class="form-control border-0 shadow" />
@@ -31,16 +32,16 @@
                     <input asp-for="EndDate" type="date" class="form-control border-0 shadow" />
                     <label asp-for="EndDate" class="ms-2"></label>
                 </div>
-                <div class="form-floating mb-3">
-                    <select asp-for="Location" class="form-select">
-                        <option disabled selected>-Select Location-</option>
+                <div class="form-floating py-2 col-12">
+                    <div><label asp-for="Location" class="ms-2"></label></div>
+                    <select id="locationSelect" asp-for="Location" class=" py-2 col-12 selectpicker" multiple>
                         @foreach (var city in SD.Cities)
                         {
                             <option value="@city">@city</option>
                         }
                     </select>
-
                 </div>
+
                 <div class="form-check py-2 col-12">
                     <input asp-for="IsPaid" class="form-check-input" />
                     <label asp-for="IsPaid" class="form-check-label">Paid</label>
@@ -55,6 +56,7 @@
                 </div>
                 
                 <div class="form-floating mb-3">
+                    
                     <select asp-for="Position"  class="form-select">
                         <option disabled selected>-Select Position-</option>
                         @foreach (var position in SD.Position)
@@ -62,11 +64,11 @@
                             <option value="@position">@position</option>
                         }
                     </select>
-
+                    <label asp-for="Position" class="ms-2"></label>
                 </div>
                 <div class="form-floating mb-3">
-                    <select asp-for="ProgLanguage" class="form-select">
-                        <option disabled selected>-Select Programming Language-</option>
+                    <div><label asp-for="ProgLanguage" class="ms-2"></label></div>
+                    <select id="progLanguageSelect" asp-for="ProgLanguage" class=" py-2 col-12 selectpicker" multiple>
                         @foreach (var language in SD.ProgLanguage)
                         {
                             <option value="@language">@language</option>
@@ -75,8 +77,8 @@
 
                 </div>
                 <div class="form-floating mb-3">
-                    <select asp-for="Technology" class="form-select">
-                        <option disabled selected>-Select Technology-</option>
+                    <div><label asp-for="Technology" class="ms-2"></label></div>
+                    <select id="technologySelect" asp-for="Technology" class=" py-2 col-12 selectpicker" multiple>
                         @foreach (var technology in SD.Technology)
                         {
                             <option value="@technology">@technology</option>
@@ -92,7 +94,7 @@
                             <option value="@place">@place</option>
                         }
                     </select>
-
+                    <label asp-for="WorkPlace" class="ms-2"></label>
                 </div>
 
                 <div class="row pt-2">
@@ -125,6 +127,27 @@
                 { value: 'Email', title: 'Email' },
             ],
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
+        });
+
+        $(document).ready(function () {
+            $('#locationSelect').select2({
+                placeholder: "-Select Location-",
+                allowClear: true
+            });
+        });
+
+        $(document).ready(function () {
+            $('#progLanguageSelect').select2({
+                placeholder: "-Select Programming Language-",
+                allowClear: true
+            });
+        });
+
+        $(document).ready(function () {
+            $('#technologySelect').select2({
+                placeholder: "-Select Technology-",
+                allowClear: true
+            });
         });
     </script>
 }

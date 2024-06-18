@@ -1,4 +1,4 @@
-﻿@model CodeIntern.Models.Internship
+﻿@model CodeIntern.Models.InternshipViewModel
 
 <div class="card shadow border-0 mt-4">
     <div class="card-header bg-secondary bg-gradient ml-0 py-3">
@@ -28,14 +28,16 @@
                 <div class="form-floating py-2 col-12">
                     <input asp-for="StartDate" type="date" class="form-control border-0 shadow" />
                     <label asp-for="StartDate" class="ms-2"></label>
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
                 </div>
                 <div class="form-floating py-2 col-12">
                     <input asp-for="EndDate" type="date" class="form-control border-0 shadow" />
                     <label asp-for="EndDate" class="ms-2"></label>
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
                 </div>
-                <div class="form-floating mb-3">
-                    <select asp-for="Location" class="form-select">
-                        <option disabled>@Model.Location</option>
+                <div class="form-floating py-2 col-12">
+                    <div><label asp-for="Location" class="ms-2"></label></div>
+                    <select id="locationSelect" asp-for="Location" class=" py-2 col-12 selectpicker" multiple>
                         @foreach (var city in SD.Cities)
                         {
                             <option value="@city">@city</option>
@@ -62,19 +64,21 @@
                             <option value="@position">@position</option>
                         }
                     </select>
+                    <label asp-for="Position" class="ms-2"></label>
                 </div>
                 <div class="form-floating mb-3">
-                    <select asp-for="ProgLanguage" class="form-select">
-                        <option disabled>@Model.ProgLanguage</option>
+                    <div><label asp-for="ProgLanguage" class="ms-2"></label></div>
+                    <select id="progLanguageSelect" asp-for="ProgLanguage" class="py-2 col-12 selectpicker" multiple>
                         @foreach (var language in SD.ProgLanguage)
                         {
                             <option value="@language">@language</option>
                         }
                     </select>
+                    
                 </div>
                 <div class="form-floating mb-3">
-                    <select asp-for="Technology" class="form-select">
-                        <option disabled>@Model.Technology</option>
+                    <div><label asp-for="Technology" class="ms-2"></label></div>
+                    <select id="technologySelect" asp-for="Technology" class=" py-2 col-12 selectpicker" multiple>
                         @foreach (var technology in SD.Technology)
                         {
                             <option value="@technology">@technology</option>
@@ -82,6 +86,7 @@
                     </select>
                 </div>
                 <div class="form-floating mb-3">
+                   
                     <select asp-for="WorkPlace" class="form-select">
                         <option disabled>@Model.WorkPlace</option>
                         @foreach (var place in SD.WorkPlace)
@@ -89,11 +94,12 @@
                             <option value="@place">@place</option>
                         }
                     </select>
+                    <label asp-for="WorkPlace" class="ms-2"></label>
                 </div>
 
                 <div class="row pt-2">
                     <div class="col-6 col-md-3">
-                        <button type="submit" class="btn btn-primary form-control" onclick="ShowMessage('Internship updated successfully!')">Update</button>
+                        <button type="submit" class="btn btn-primary form-control" onclick="updateInternship('@Model.InternshipId')">Update</button>
                     </div>
                     <div class="col-6 col-md-3">
                         <a asp-controller="Internship" asp-action="Index" class="btn btn-outline-primary border form-control">
@@ -119,6 +125,27 @@
                 { value: 'Email', title: 'Email' },
             ],
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
+        });
+
+        $(document).ready(function () {
+            $('#locationSelect').select2({
+                placeholder: "-Select Location-",
+                allowClear: true
+            });
+        });
+
+        $(document).ready(function () {
+            $('#progLanguageSelect').select2({
+                placeholder: "-Select Programming Language-",
+                allowClear: true
+            });
+        });
+
+        $(document).ready(function () {
+            $('#technologySelect').select2({
+                placeholder: "-Select Technology-",
+                allowClear: true
+            });
         });
     </script>
 }
