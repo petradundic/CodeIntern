@@ -12,12 +12,6 @@
         <div class="row pb-3">
             <div class="col-6">
             </div>
-            @*<div class="col-6 text-end">
-            @if (User.IsInRole(SD.Role_Company))
-            {
-            <a asp-controller="Company" asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create New Company </a>}
-            </div>*@
         </div>
         <div class="mb-3">
             <button id="filterButton" class="btn btn-primary mb-2" type="button"><i class="bi bi-filter"></i>Filter</button>
@@ -88,9 +82,12 @@
                                         <a asp-controller="Company" asp-action="Edit" asp-route-id="@obj.CompanyId" class="btn btn-primary mx-2">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
-                                        <a asp-controller="Company" asp-action="Delete" asp-route-id="@obj.CompanyId" class="btn btn-danger mx-2">
-                                            <i class="bi bi-trash-fill"></i> Delete
-                                        </a>
+                                        @if (obj.RegistrationRequest!=false)
+                                        {
+                                            <a asp-controller="Company" asp-action="Delete" asp-route-id="@obj.CompanyId" class="btn btn-danger mx-2">
+                                                <i class="bi bi-trash-fill"></i> Delete
+                                            </a>
+                                        }
                                     }
                                 </div>
                             </td>

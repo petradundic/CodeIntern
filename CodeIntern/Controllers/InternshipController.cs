@@ -372,7 +372,7 @@ namespace CodeIntern.Controllers
                 internships = internships.Where(x => x.WorkPlace == workPlace).ToList();
             }
 
-            return View("Index", internships);
+            return RedirectToAction("Index", internships);
         }
 
         public IActionResult Search(string searchTerm)

@@ -274,6 +274,7 @@ namespace CodeIntern.Controllers
                     _companyRepository.Save();
                 }
                 user.Email = model.Email;
+                user.UserName = model.Email;
                 var result = await _userManager.UpdateAsync(user);
 
                 if (result.Succeeded && User.IsInRole(SD.Role_Admin))

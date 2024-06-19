@@ -114,24 +114,53 @@ namespace CodeIntern.Controllers
                 return NotFound();
             }
 
-            return View(company);
+            // Map Company model to EditCompanyViewModel
+            var editViewModel = new EditCompanyViewModel
+            {
+                CompanyId = company.CompanyId,
+                CompanyName = company.CompanyName,
+                Email = company.Email,
+                Website = company.Website,
+                Country = company.Country,
+                City = company.City,
+                Address = company.Address,
+                Industry = company.Industry,
+                Description = company.Description
+            };
+
+            return View(editViewModel);
         }
+
 
         [HttpPost]
         [Authorize(Roles = "Admin,Company")]
-        public IActionResult Edit(Company obj, IFormFile? file)
+        public IActionResult Edit(EditCompanyViewModel viewModel, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
+                // Map EditCompanyViewModel to Company model
+                var company = _companyRepo.Get(x=>x.CompanyId == viewModel.CompanyId);
+
+
+                company.CompanyId = viewModel.CompanyId;
+                company.CompanyName = viewModel.CompanyName;
+                company.Email = viewModel.Email;
+                company.Website = viewModel.Website;
+                company.Country = viewModel.Country;
+                company.City = viewModel.City;
+                company.Address = viewModel.Address;
+                company.Industry = viewModel.Industry;
+                company.Description = viewModel.Description;
+
                 if (file != null)
                 {
                     string wwwRootPath = _webHostEnvironment.WebRootPath;
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string companyLogoPath = Path.Combine(wwwRootPath, @"images\company_logo");
 
-                    if (!string.IsNullOrEmpty(obj.ImageUrl))
+                    if (!string.IsNullOrEmpty(company.ImageUrl))
                     {
-                        var oldImageUrl = Path.Combine(wwwRootPath, obj.ImageUrl.TrimStart('\\'));
+                        var oldImageUrl = Path.Combine(wwwRootPath, company.ImageUrl.TrimStart('\\'));
                         if (System.IO.File.Exists(oldImageUrl))
                         {
                             System.IO.File.Delete(oldImageUrl);
@@ -143,15 +172,16 @@ namespace CodeIntern.Controllers
                         file.CopyTo(fileStream);
                     }
 
-                    obj.ImageUrl = @"images\company_logo\" + fileName;
+                    company.ImageUrl = @"images\company_logo\" + fileName;
                 }
-                _companyRepo.Update(obj);
+                _companyRepo.Update(company);
                 _companyRepo.Save();
                 return RedirectToAction("Index");
             }
-            return View();
 
+            return View(viewModel);
         }
+
         [Authorize(Roles = "Admin,Company")]
         public IActionResult Delete(int? id)
         {
@@ -204,7 +234,7 @@ namespace CodeIntern.Controllers
                 }
             }
 
-            return View("Index", companies);
+            return RedirectToAction("Index", companies);
         }
 
 

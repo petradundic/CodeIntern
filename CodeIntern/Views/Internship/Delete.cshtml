@@ -12,10 +12,15 @@
             <input asp-for="InternshipId" hidden />
             <div class="border p-3 mt-4">
                 <div class="form-floating py-2 col-12">
-                    <input asp-for="CompanyName" disabled class="form-control border-0 shadow" />
-                    <label asp-for="CompanyName" class="ms-2"></label>
-                    <input asp-for="Title" disabled class="form-control border-0 shadow" />
-                    <label asp-for="Title" class="ms-2"></label>
+                    <div>
+                        <label asp-for="CompanyName" class="ms-2"></label>
+                        <input asp-for="CompanyName" disabled class="form-control border-0 shadow" />
+
+                    </div>
+                    <div>
+                        <label asp-for="Title" class="ms-2"></label>
+                        <input asp-for="Title" disabled class="form-control border-0 shadow" />
+                    </div>
                 </div>
 
 
