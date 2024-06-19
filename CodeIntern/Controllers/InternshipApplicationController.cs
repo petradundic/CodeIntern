@@ -190,9 +190,6 @@ namespace CodeIntern.Controllers
                 internshipApplication.FirstName = model.FirstName;
                 internshipApplication.LastName = model.LastName;
                 internshipApplication.Email = model.Email;
-                
-
-
                 if (model.CvFile != null)
                 {
                     // Extract the file extension

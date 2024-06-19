@@ -4,49 +4,36 @@
     <input type="hidden" name="InternshipApplicationId" value="@Model.InternshipApplicationId" />
 
     <div class="form-floating py-2 col-12">
-        <input asp-for="FirstName" class="form-control border-0 shadow" disabled="@(!User.IsInRole("Student"))" />
+        <input asp-for="FirstName" class="form-control border-0 shadow" />
         <label asp-for="FirstName" class="ms-2"></label>
     </div>
 
     <div class="form-floating py-2 col-12">
-        <input asp-for="LastName" class="form-control border-0 shadow" disabled="@(!User.IsInRole("Student"))" />
+        <input asp-for="LastName" class="form-control border-0 shadow"/>
         <label asp-for="LastName" class="ms-2"></label>
     </div>
 
     <div class="form-floating py-2 col-12">
-        <input asp-for="Email" class="form-control border-0 shadow" disabled="@(!User.IsInRole("Student"))" />
+        <input asp-for="Email" class="form-control border-0 shadow"/>
         <label asp-for="Email" class="ms-2"></label>
     </div>
 
     <div class="form-floating py-2 col-12">
-        <input asp-for="CvFile" class="form-control border-0 shadow" type="file" id="cvFile" name="CvFile" disabled="@(!User.IsInRole("Student"))" />
+        <input asp-for="CvFile" class="form-control border-0 shadow" type="file" id="cvFile" name="CvFile"/>
         <label asp-for="CvFile" class="ms-2"></label>
     </div>
 
     @if (!User.IsInRole("Student"))
     {
         <div class="form-floating py-2 col-12">
-            <select asp-for="SelectedStatus" class="form-select" disabled="@(!User.IsInRole("Student"))">
+            <select asp-for="SelectedStatus" class="form-select">
                 <option value="In_progress">In progress</option>
                 <option value="Accepted">Accepted</option>
                 <option value="Declined">Declined</option>
-                <option value="Applied" selected>Applied</option> <!-- Default value -->
             </select>
             <label asp-for="SelectedStatus" class="ms-2"></label>
         </div>
     }
 
-    <button type="submit"  disabled="@(!User.IsInRole("Student"))">Update</button>
+    <button type="submit">Update</button>
 </form>
-
-@* JavaScript to set default value to "Applied" if none selected *@
-<script>
-    document.querySelector('form').addEventListener('submit', function (event) {
-        // Check if SelectedStatus has a value other than the default options
-        var statusElement = document.querySelector('#SelectedStatus');
-        if (statusElement.value === '') {
-            // Set default value to "Applied" if none selected
-            statusElement.value = 'Applied';
-        }
-    });
-</script>
