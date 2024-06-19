@@ -20,7 +20,7 @@ namespace CodeIntern.Models
         [Display(Name = "Email")]
         public string? Email { get; set; }
 
-        [Display(Name = "Cv File")]
+        [Display(Name = "Cv File (*.pdf/*.zip)")]
         public IFormFile? CvFile { get; set; }
         public string? FileExtension { get; set; }
     }
