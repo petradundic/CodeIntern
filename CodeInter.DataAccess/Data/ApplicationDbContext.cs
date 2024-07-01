@@ -18,7 +18,7 @@ namespace CodeIntern.DataAccess.Data
         public DbSet<InternshipApplication> InternshipApplication { get; set;}
         public DbSet<SavedInternship> SavedInternship { get; set; }
         public DbSet<Notification> Notification { get; set; }
-
+        public DbSet<StudentProfile> StudentProfile { get; set; }
 
     }
 }

@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace CodeIntern.Models
 {
-    public class EditViewModel
+    public class ApplicationEditViewModel
     {
         public int InternshipApplicationId { get; set; }
         [Display(Name = "First Name")]
@@ -28,5 +28,17 @@ namespace CodeIntern.Models
         public string? SelectedStatus { get; set; }
 
         public string? FileExtension { get; set; }  // Add this property
+
+        public ApplicationEditViewModel(InternshipApplication intApp, StudentProfile stProfiile)
+        {
+            InternshipApplicationId = intApp.InternshipApplicationId;
+            FirstName = stProfiile.FirstName;
+            LastName = stProfiile.LastName;
+            Email = stProfiile.Email;
+            InternshipApplicationId = intApp.InternshipApplicationId;
+        }
+        public ApplicationEditViewModel()
+        {
+        }
     }
 }

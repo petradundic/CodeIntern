@@ -25,7 +25,6 @@
                         <i class="bi bi-plus-circle"></i> Create New Internship
                     </a>
                 </div>
-
             }
         </div>
         <div class="mb-3">
@@ -34,13 +33,10 @@
                 @if (User.IsInRole(SD.Role_Company))
                 {
                     <div class=" col-2 text-start">
-                        <a asp-controller="Internship" asp-action="ExpiredInternships" class="btn btn-secondary">See expired internships
-                        </a>
+                        <a asp-controller="Internship" asp-action="ExpiredInternships" class="btn btn-secondary">See expired internships</a>
                     </div>
                     <div class=" col-2 text-start" style="margin-top:5px">
-                        <a asp-controller="Internship" asp-action="Index" asp-route-companyId="@userId" class="btn btn-secondary">
-                            My Internships
-                        </a>
+                        <a asp-controller="Internship" asp-action="Index" asp-route-companyId="@userId" class="btn btn-secondary">My Internships</a>
                     </div>
                 }
                 <div class="form-check" style="margin-top:5px">
@@ -84,71 +80,57 @@
                 <button id="applyFilterButton" class="btn btn-primary mt-2 mb-2" type="button">Apply Filter</button>
             </div>
         </div>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>
-                        Title
-                    </th>
-                    <th>
-                        Company
-                    </th>
-                    <th>
-                        Start Date
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var obj in Model)
-                {
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="alert alert-info text-center">
+                <strong>No results found</strong>
+            </div>
+        }
+        else
+        {
+            <table class="table table-bordered table-striped">
+                <thead>
                     <tr>
-                        <td>@obj.Title</td>
-                        <td>
-                            @obj.CompanyName
-
-                        </td>
-                        <td>
-                            @obj.StartDate.ToString("dd.MM.yyyy")
-
-                        </td>
-
-                        <td>
-                            <div class="w-75 btn-group" role="group">
-
-                                <a asp-controller="Internship" asp-action="Details" asp-route-id="@obj.InternshipId" class="btn btn-primary mx-2">
-                                    Details
-                                </a>
-                                @if (User.IsInRole(SD.Role_Company) || User.IsInRole(SD.Role_Admin))
-                                {
-                                    <a asp-controller="Internship" asp-action="Edit" asp-route-id="@obj.InternshipId" class="btn btn-primary mx-2">
-                                        <i class="bi bi-pencil-square"></i> Edit
-                                    </a>
-
-
-                                    <a asp-controller="Internship" asp-action="Delete" asp-route-id="@obj.InternshipId" class="btn btn-danger mx-2">
-                                        <i class="bi bi-trash-fill"></i> Delete
-                                    </a>
-                                }
-                            </div>
-                        </td>
+                        <th>Title</th>
+                        <th>Company</th>
+                        <th>Start Date</th>
+                        <th></th>
                     </tr>
-                }
-            </tbody>
-        </table>
-
+                </thead>
+                <tbody>
+                    @foreach (var obj in Model)
+                    {
+                        <tr>
+                            <td>@obj.Title</td>
+                            <td>@obj.CompanyName</td>
+                            <td>@obj.StartDate.ToString("dd.MM.yyyy")</td>
+                            <td>
+                                <div class="w-75 btn-group" role="group">
+                                    <a asp-controller="Internship" asp-action="Details" asp-route-id="@obj.InternshipId" class="btn btn-primary mx-2">Details</a>
+                                    @if (User.IsInRole(SD.Role_Company) || User.IsInRole(SD.Role_Admin))
+                                    {
+                                        <a asp-controller="Internship" asp-action="Edit" asp-route-id="@obj.InternshipId" class="btn btn-primary mx-2">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                        <a asp-controller="Internship" asp-action="Delete" asp-route-id="@obj.InternshipId" class="btn btn-danger mx-2">
+                                            <i class="bi bi-trash-fill"></i> Delete
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     </div>
 </div>
-
 
 <script>
     document.getElementById("filterButton").addEventListener("click", function () {
         var filterOptions = document.getElementById("filterOptions");
-        if (filterOptions.style.display === "none") {
-            filterOptions.style.display = "block";
-        } else {
-            filterOptions.style.display = "none";
-        }
+        filterOptions.style.display = filterOptions.style.display === "none" ? "block" : "none";
     });
 
     document.getElementById("applyFilterButton").addEventListener("click", function () {
@@ -159,8 +141,6 @@
         var techFilter = document.getElementById("techFilter");
         var workPlaceFilter = document.getElementById("workPlaceFilter");
 
-
-
         var paidValue = paidFilter ? paidFilter.value : "";
         var locationValue = locationFilter ? locationFilter.value : "";
         var positionValue = positionFilter ? positionFilter.value : "";
@@ -169,6 +149,5 @@
         var workPlaceValue = workPlaceFilter ? workPlaceFilter.value : "";
 
         window.location.href = '/Internship/Filter?paid=' + paidValue + '&location=' + locationValue + '&position=' + positionValue + '&language=' + prLanguageValue + '&technology=' + techValue + '&workPlace=' + workPlaceValue;
-
     });
 </script>

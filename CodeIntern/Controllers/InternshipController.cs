@@ -28,8 +28,15 @@ namespace CodeIntern.Controllers
             _internApplicationRepo = internApplicationRepo;
             _notificationRepository = notificationRepository;
         }
-        public IActionResult Index(string? companyId, List<Internship>? obj)
+        public IActionResult Index(string? companyId, string? companyName, List<Internship>? obj, bool? isSearch)
         {
+
+            if (obj.Count == 0 && isSearch == true)
+            {
+                return View(obj);
+            }
+
+
             List<Internship> internshipsList = _internshipRepo.GetAll().ToList();
 
 
@@ -80,6 +87,10 @@ namespace CodeIntern.Controllers
             if (!string.IsNullOrEmpty(companyId))
             {
                 internshipsList = _internshipRepo.GetAll(x => x.CompanyId == companyId).ToList();
+            }
+            if (!string.IsNullOrEmpty(companyName))
+            {
+                internshipsList = _internshipRepo.GetAll(x => x.CompanyName == companyName).ToList();
             }
             return View(internshipsList);
         }
@@ -377,16 +388,21 @@ namespace CodeIntern.Controllers
 
         public IActionResult Search(string searchTerm)
         {
+
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 List<Internship> results = _internshipRepo.GetAll(x => x.Title.Contains(searchTerm) || x.CompanyName == searchTerm || x.Description.Contains(searchTerm)).ToList();
-                if (results.Count > 0)
+
+                if (results == null || results.Count == 0)
                 {
-                    return View("Index", results);
+                   return RedirectToAction("Index", new { obj = new List<Internship>(), isSearch = true });
                 }
+                else 
+                    return RedirectToAction("Index", results);
             }
 
-            return View("Index");
+
+            return RedirectToAction("Index");
         }
 
 

@@ -47,11 +47,13 @@
                     @if (!ViewBag.HasApplied)
                     {
                         <div class="col-6 col-md-3">
-                            <a asp-controller="InternshipApplication" asp-action="Create" asp-route-internshipId="@Model.InternshipId" class="btn btn-outline-primary border form-control">
-                                Apply for Internship
-                            </a>
+                            <form asp-controller="InternshipApplication" asp-action="Create" method="post">
+                                <input type="hidden" name="internshipId" value="@Model.InternshipId" />
+                                <button type="submit" class="btn btn-outline-primary border form-control">Apply for Internship</button>
+                            </form>
                         </div>
                     }
+
                     else
                     {
                         <div class="col-6 col-md-3">

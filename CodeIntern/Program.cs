@@ -33,6 +33,7 @@ builder.Services.AddScoped<IInternshipRepository, InternshipRepository>();
 builder.Services.AddScoped<IInternApplicationRepository, InternApplicationRepository>();
 builder.Services.AddScoped<ISavedInternRepository, SavedInternRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IStudentProfileRepository, StudentProfileRepository>();
 builder.Services.AddScoped<IEmailSender,EmailSender>();
 builder.Services.AddScoped<RegisterModel>();
 var app = builder.Build();

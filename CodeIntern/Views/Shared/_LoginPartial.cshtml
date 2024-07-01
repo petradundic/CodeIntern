@@ -15,10 +15,17 @@
                     <li>
                         <a id="manage" class="dropdown-item" asp-controller="Administration" asp-action="UpdateUser" asp-route-id="@UserManager.GetUserId(User)" title="Change email">@UserManager.GetUserName(User)</a>
                     </li>
+                    @if (User.IsInRole(SD.Role_Student))
+                    {
+                        <li>
+                            <a class="dropdown-item" asp-controller="Administration" asp-action="CreateUserProfile"><i class="bi bi-pencil"></i>Manage Application Profile</a>
+                        </li>
+                    }
+
                     @if (User.IsInRole(SD.Role_Company))
                     {
                         <li>
-                            <a class="dropdown-item" asp-controller="Company" asp-action="Edit" asp-route-companyUserId="@UserManager.GetUserId(User)">Edit Company Info</a>
+                            <a class="dropdown-item" asp-controller="Company" asp-action="Edit" asp-route-companyUserId="@UserManager.GetUserId(User)"><i class="bi bi-pencil"></i>Edit Company Info</a>
                         </li>
                     }
                     <li>

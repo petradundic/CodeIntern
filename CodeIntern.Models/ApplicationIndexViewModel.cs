@@ -1,0 +1,40 @@
+﻿using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+
+namespace CodeIntern.Models
+{
+    public class ApplicationIndexViewModel
+    {
+        public int InternshipApplicationId { get; set; }
+        public int InternshipId { get; set; }
+
+        [Display(Name = "First Name")]
+        public string? FirstName { get; set; }
+
+        [Display(Name = "Last Name")]
+        public string? LastName { get; set; }
+
+        [Display(Name = "Email")]
+        public string? Email { get; set; }
+        public string? Status { get; set; }
+
+        public ApplicationIndexViewModel(InternshipApplication intApp, StudentProfile stProfiile)
+        {
+            InternshipApplicationId = intApp.InternshipApplicationId;
+            FirstName = stProfiile.FirstName;
+            LastName = stProfiile.LastName;
+            Email = stProfiile.Email;
+            Status = intApp.Status;
+            InternshipApplicationId=intApp.InternshipApplicationId;
+        }
+        public ApplicationIndexViewModel()
+        {
+        }
+    }
+}

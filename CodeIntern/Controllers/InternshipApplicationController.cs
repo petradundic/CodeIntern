@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using static iTextSharp.text.pdf.AcroFields;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace CodeIntern.Controllers
@@ -13,34 +14,51 @@ namespace CodeIntern.Controllers
         private readonly IInternApplicationRepository _internApplicationRepo;
         private readonly IInternshipRepository _internshipRepository;
         private readonly INotificationRepository _notificationRepository;
+        private readonly IStudentProfileRepository _studentProfileRepository;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public InternshipApplicationController(IInternApplicationRepository db, IInternshipRepository internshipRepository, UserManager<IdentityUser> userManager, INotificationRepository notificationRepository)
+        public InternshipApplicationController(IInternApplicationRepository db, IInternshipRepository internshipRepository, UserManager<IdentityUser> userManager, INotificationRepository notificationRepository, IStudentProfileRepository studentProfileRepository)
         {
             _internApplicationRepo = db;
             _internshipRepository = internshipRepository;
             _userManager = userManager;
             _notificationRepository = notificationRepository;
+            _studentProfileRepository = studentProfileRepository;
         }
         [Authorize(Roles = "Admin,Company,Student")]
         public IActionResult Index(int? internshipId, string? studentId)
         {
             List<InternshipApplication> applications = null;
+            List<ApplicationIndexViewModel> vm = new List<ApplicationIndexViewModel>();
             if (internshipId != null)
             {
                 applications = _internApplicationRepo.GetAll(x => x.InternshipId == internshipId).ToList();
+                vm= GetInternshipApplicationsViewModelList(applications);
             }
             else if (!String.IsNullOrEmpty(studentId))
             {
                 applications = _internApplicationRepo.GetAll(x => x.StudentId == studentId).ToList();
+                vm = GetInternshipApplicationsViewModelList(applications);
             }
             else
             {
                 applications = _internApplicationRepo.GetAll().ToList();
+                vm = GetInternshipApplicationsViewModelList(applications);
             }
-            return View(applications);
+            return View(vm);
         }
 
+        public List<ApplicationIndexViewModel> GetInternshipApplicationsViewModelList(List<InternshipApplication> applications)
+        {
+            List<ApplicationIndexViewModel> vmList = new List<ApplicationIndexViewModel>();
+
+            foreach (var item in applications)
+            {
+                StudentProfile profile = _studentProfileRepository.Get(x => x.StudentId == item.StudentId);
+                vmList.Add(new ApplicationIndexViewModel(item,profile));
+            }
+            return vmList;
+        }
         public IActionResult MyInternApplications()
         {
             var userId = _userManager.GetUserId(User);
@@ -50,75 +68,44 @@ namespace CodeIntern.Controllers
         [Authorize(Roles = "Admin, Company, Student")]
         public IActionResult Details(int id, int notificationId)
         {
-            InternshipApplication? internshipApplicationFromDb = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
+            InternshipApplication? internshipApplication = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
+            StudentProfile student=_studentProfileRepository.Get(x => x.StudentId == internshipApplication.StudentId);
+            ApplicationIndexViewModel vm=new ApplicationIndexViewModel(internshipApplication, student);
             Notification notification = _notificationRepository.Get(x => x.NotificationId == notificationId);
             notification.IsRead = true;
             _notificationRepository.Update(notification);
             _notificationRepository.Save();
 
-            return View(internshipApplicationFromDb);
-        }
-        [Authorize(Roles = "Admin, Student")]
-        public IActionResult Create()
-        {
-            return View();
+            return View(vm);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin, Student")]
-        [HttpPost]
-        [Authorize(Roles = "Admin, Student")]
-        public IActionResult Create(ApplicationViewModel temp, int InternshipId)
+        public async Task<IActionResult> Create(int internshipId)
         {
-            // Check if a file is uploaded
-            if (temp.CvFile != null)
+            InternshipApplication obj = new InternshipApplication();
+            Internship? internship = await _internshipRepository.GetAsync(x => x.InternshipId == internshipId);
+            var userId = _userManager.GetUserId(User);
+            StudentProfile? student = await _studentProfileRepository.GetAsync(x => x.StudentId == userId);
+
+            if (student == null)
             {
-                // Extract the file extension
-                temp.FileExtension = Path.GetExtension(temp.CvFile.FileName).ToLower();
-
-                // Validate the file extension
-                if (temp.FileExtension != ".pdf" && temp.FileExtension != ".zip")
-                {
-                    ModelState.AddModelError("CvFile", "Only PDF or ZIP files are allowed.");
-                    return View(temp);  // Return the view with the model error
-                }
-
-                // Convert IFormFile to byte array
-                using (var memoryStream = new MemoryStream())
-                {
-                    temp.CvFile.CopyTo(memoryStream);
-                    byte[] cvBytes = memoryStream.ToArray();
-
-                    InternshipApplication obj = new InternshipApplication();
-
-                    Internship internship = _internshipRepository.Get(x => x.InternshipId == InternshipId);
-                    var userId = _userManager.GetUserId(User);
-
-                    obj.InternshipId = InternshipId;
-                    obj.StudentId = userId;
-                    obj.DateCreated = DateTime.Now;
-                    obj.FirstName = temp.FirstName;
-                    obj.LastName = temp.LastName;
-                    obj.Email = temp.Email;
-                    obj.CV = cvBytes;
-                    obj.Status = "Applied";
-                    obj.InternshipTitle = internship.Title;
-                    obj.FileExtension = temp.FileExtension;
-
-                    _internApplicationRepo.Add(obj);
-                    _internApplicationRepo.Save();
-                    internship.NumOfApplications += 1;
-                    _internshipRepository.Update(internship);
-                    _internshipRepository.Save();
-
-                    return RedirectToAction("Details", "Internship", new { id = obj.InternshipId });
-                }
+                ViewBag.IntershipId = internshipId;
+                return RedirectToAction("CreateUserProfile", "Administration");
             }
-            else
-            {
-                ModelState.AddModelError("CvFile", "File upload is required.");
-                return View(temp);  // Return the view with the model error
-            }
+
+            obj.InternshipId = internshipId;
+            obj.StudentId = userId;
+            obj.DateCreated = DateTime.Now;
+            obj.Status = "Applied";
+            obj.InternshipTitle = internship.Title;
+
+            _internApplicationRepo.Add(obj);
+            await _internApplicationRepo.SaveAsync();
+            internship.NumOfApplications += 1;
+            _internshipRepository.Update(internship);
+            await _internshipRepository.SaveAsync();
+            return RedirectToAction("Details", "Internship", new { id = obj.InternshipId });
         }
 
         [Authorize(Roles = "Admin, Company, Student")]
@@ -131,9 +118,21 @@ namespace CodeIntern.Controllers
                 return NotFound();
             }
 
-            byte[] fileBytes = obj.CV;
-            string fileExtension = obj.FileExtension?.ToLower();
+            StudentProfile student = _studentProfileRepository.Get(x => x.StudentId == obj.StudentId);
+            if (student == null || string.IsNullOrEmpty(student.CVPath))
+            {
+                return NotFound();
+            }
 
+            string filePath = student.CVPath;
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound();
+            }
+
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+            string fileExtension = Path.GetExtension(filePath)?.ToLower();
             string mimeType;
 
             switch (fileExtension)
@@ -149,11 +148,6 @@ namespace CodeIntern.Controllers
             }
         }
 
-        //public IActionResult ViewPdf(int id)
-        //{
-        //    InternshipApplication obj = _internApplicationRepo.Get(X => X.InternshipApplicationId == id);
-        //    return File(obj.CV, "application/pdf");
-        //}
         [Authorize(Roles = "Admin, Company, Student")]
         public IActionResult Edit(int id)
         {
@@ -162,22 +156,15 @@ namespace CodeIntern.Controllers
             {
                 return NotFound();
             }
+            StudentProfile profile = _studentProfileRepository.Get(x => x.StudentId == internshipApplication.StudentId);
+            ApplicationEditViewModel vm = new ApplicationEditViewModel(internshipApplication,profile);
 
-            var editViewModel = new EditViewModel
-            {
-                InternshipApplicationId = internshipApplication.InternshipApplicationId,
-                FirstName = internshipApplication.FirstName,
-                LastName = internshipApplication.LastName,
-                Email = internshipApplication.Email,
-                SelectedStatus = internshipApplication.Status
-            };
-
-            return View(editViewModel);
+            return View(vm);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin, Company, Student")]
-        public IActionResult Edit(EditViewModel model)
+        public IActionResult Edit(ApplicationEditViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -186,32 +173,6 @@ namespace CodeIntern.Controllers
                 {
                     return NotFound();
                 }
-
-                internshipApplication.FirstName = model.FirstName;
-                internshipApplication.LastName = model.LastName;
-                internshipApplication.Email = model.Email;
-                if (model.CvFile != null)
-                {
-                    // Extract the file extension
-                    model.FileExtension = Path.GetExtension(model.CvFile.FileName).ToLower();
-
-                    // Validate the file extension
-                    if (model.FileExtension != ".pdf" && model.FileExtension != ".zip")
-                    {
-                        ModelState.AddModelError("CvFile", "Only PDF or ZIP files are allowed.");
-                        return View(model);  // Return the view with the model error
-                    }
-
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        model.CvFile.CopyTo(memoryStream);
-                        byte[] cvBytes = memoryStream.ToArray();
-
-                        internshipApplication.CV = cvBytes;
-                        internshipApplication.FileExtension = model.FileExtension;
-                    }
-                }
-
                 if (!String.IsNullOrEmpty(model.SelectedStatus))
                 {
                     if (model.SelectedStatus != internshipApplication.Status)
@@ -242,7 +203,7 @@ namespace CodeIntern.Controllers
 
                 return RedirectToAction("Index");
             }
-                
+
 
             return View(model);
         }

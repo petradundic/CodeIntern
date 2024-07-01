@@ -14,6 +14,8 @@ namespace CodeIntern.Utility
         public const string Role_Company = "Company";
         public const string Role_Student = "Student";
 
+        public const string CvPath = "C:\\CodeInternUserProfiles\\";
+
         public static List<string> Position = new List<string>
         {
             "Software Developer",
