@@ -22,6 +22,7 @@ namespace CodeIntern.Models
 
         public string? InternshipTitle { get; set;}
 
-
+        public string CVPath { get; set; }
+        public string? FileExtension { get; set; }
     }
 }

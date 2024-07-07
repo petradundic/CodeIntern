@@ -29,13 +29,12 @@ namespace CodeIntern.Models
 
         public string? FileExtension { get; set; }  // Add this property
 
-        public ApplicationEditViewModel(InternshipApplication intApp, StudentProfile stProfiile)
+        public ApplicationEditViewModel(InternshipApplication intApp, ApplicationUser student)
         {
             InternshipApplicationId = intApp.InternshipApplicationId;
-            FirstName = stProfiile.FirstName;
-            LastName = stProfiile.LastName;
-            Email = stProfiile.Email;
-            InternshipApplicationId = intApp.InternshipApplicationId;
+            FirstName = student.FirstName;
+            LastName = student.LastName;
+            Email = student.Email;
         }
         public ApplicationEditViewModel()
         {

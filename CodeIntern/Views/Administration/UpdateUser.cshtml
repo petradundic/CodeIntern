@@ -14,7 +14,17 @@
                 <div class="card-body"> 
                     <form asp-action="UpdateUser" method="post" class="form">
                         <input type="hidden" asp-for="Id" />
-
+                        @if (User.IsInRole(SD.Role_Student))
+                        {
+                            <div class="form-floating py-2 col-12">
+                                <input asp-for="FirstName" class="form-control border-0 shadow" />
+                                <label asp-for="FirstName" class="ms-2"></label>
+                            </div>
+                            <div class="form-floating py-2 col-12">
+                                <input asp-for="LastName" class="form-control border-0 shadow" />
+                                <label asp-for="LastName" class="ms-2"></label>
+                            </div>
+                        }
                         <div class="form-group">
                             <label asp-for="Email">Email:</label>
                             <input asp-for="Email" class="form-control" required>

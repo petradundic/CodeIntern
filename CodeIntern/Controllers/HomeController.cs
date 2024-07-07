@@ -12,8 +12,8 @@ namespace CodeIntern.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IInternshipRepository _internshipRepository;
         private readonly INotificationRepository _notificationRepository;
-        private readonly UserManager<IdentityUser> _userManager;
-        public HomeController(ILogger<HomeController> logger, IInternshipRepository internshipRepository, INotificationRepository notificationRepository, UserManager<IdentityUser> userManager)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public HomeController(ILogger<HomeController> logger, IInternshipRepository internshipRepository, INotificationRepository notificationRepository, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _internshipRepository = internshipRepository;

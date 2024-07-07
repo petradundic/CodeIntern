@@ -17,8 +17,16 @@
         <input asp-for="Email" class="form-control border-0 shadow" disabled/>
         <label asp-for="Email" class="ms-2"></label>
     </div>
+     @if (User.IsInRole(SD.Role_Student))
+    {
+        <div class="form-floating py-2 col-12">
+            <input asp-for="CvFile" class="form-control border-0 shadow" type="file" id="cvFile" name="CvFile" />
+        <label asp-for="CvFile" class="ms-2"></label>
+        <span asp-validation-for="CvFile" class="text-danger"></span>
 
-    @if (!User.IsInRole("Student"))
+    </div>
+    }
+    @if (!User.IsInRole(SD.Role_Student))
     {
         <div class="form-floating py-2 col-12">
             <select asp-for="SelectedStatus" class="form-select">

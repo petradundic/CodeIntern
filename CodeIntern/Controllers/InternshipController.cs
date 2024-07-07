@@ -19,8 +19,8 @@ namespace CodeIntern.Controllers
         private readonly ISavedInternRepository _savedInternRepo;
         private readonly IInternApplicationRepository _internApplicationRepo;
         private INotificationRepository _notificationRepository;
-        private readonly UserManager<IdentityUser> _userManager;
-        public InternshipController(UserManager<IdentityUser> userManager, ISavedInternRepository savedInternRepo, IInternshipRepository internshipRepository, IInternApplicationRepository internApplicationRepo, INotificationRepository notificationRepository)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public InternshipController(UserManager<ApplicationUser> userManager, ISavedInternRepository savedInternRepo, IInternshipRepository internshipRepository, IInternApplicationRepository internApplicationRepo, INotificationRepository notificationRepository)
         {
             _userManager = userManager;
             _savedInternRepo = savedInternRepo;

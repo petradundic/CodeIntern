@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
@@ -13,14 +13,8 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <li>
-                        <a id="manage" class="dropdown-item" asp-controller="Administration" asp-action="UpdateUser" asp-route-id="@UserManager.GetUserId(User)" title="Change email">@UserManager.GetUserName(User)</a>
+                        <a id="manage" class="dropdown-item" asp-controller="Administration" asp-action="UpdateUser" asp-route-id="@UserManager.GetUserId(User)" title="Manage profile">@UserManager.GetUserName(User)</a>
                     </li>
-                    @if (User.IsInRole(SD.Role_Student))
-                    {
-                        <li>
-                            <a class="dropdown-item" asp-controller="Administration" asp-action="CreateUserProfile"><i class="bi bi-pencil"></i>Manage Application Profile</a>
-                        </li>
-                    }
 
                     @if (User.IsInRole(SD.Role_Company))
                     {

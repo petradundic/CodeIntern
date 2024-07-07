@@ -16,8 +16,8 @@ namespace CodeIntern.Controllers
         private readonly ICompanyRepository _companyRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly RegisterModel _registerModel;
-        private readonly UserManager<IdentityUser> _userManager;
-        public CompanyController(ICompanyRepository db, IWebHostEnvironment webHostEnvironment, RegisterModel registerModel, UserManager<IdentityUser> userManager)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public CompanyController(ICompanyRepository db, IWebHostEnvironment webHostEnvironment, RegisterModel registerModel, UserManager<ApplicationUser> userManager)
         {
             _companyRepo = db;
             _webHostEnvironment = webHostEnvironment;

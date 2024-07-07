@@ -24,14 +24,13 @@ namespace CodeIntern.Models
         public string? Email { get; set; }
         public string? Status { get; set; }
 
-        public ApplicationIndexViewModel(InternshipApplication intApp, StudentProfile stProfiile)
+        public ApplicationIndexViewModel(InternshipApplication intApp, ApplicationUser student)
         {
             InternshipApplicationId = intApp.InternshipApplicationId;
-            FirstName = stProfiile.FirstName;
-            LastName = stProfiile.LastName;
-            Email = stProfiile.Email;
+            FirstName = student.FirstName;
+            LastName = student.LastName;
+            Email = student.Email;
             Status = intApp.Status;
-            InternshipApplicationId=intApp.InternshipApplicationId;
         }
         public ApplicationIndexViewModel()
         {

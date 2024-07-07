@@ -12,8 +12,8 @@ namespace CodeIntern.Controllers
     {
         private readonly IInternshipRepository _internshipRepository;
         private readonly ISavedInternRepository _savedInternRepo;
-        private readonly UserManager<IdentityUser> _userManager;
-        public SavedInternController(ISavedInternRepository db, UserManager<IdentityUser> userManager, IInternshipRepository internshipRepository)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public SavedInternController(ISavedInternRepository db, UserManager<ApplicationUser> userManager, IInternshipRepository internshipRepository)
         {
             _savedInternRepo = db;
             _userManager = userManager;

@@ -14,8 +14,8 @@ namespace CodeIntern.Controllers
     {
 
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
 
         private ICompanyRepository _companyRepository;
@@ -27,7 +27,7 @@ namespace CodeIntern.Controllers
 
 
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IInternApplicationRepository internApplicationRepository, IInternshipRepository internshipRepository, ISavedInternRepository savedInternRepository, ICompanyRepository companyRepository, INotificationRepository notificationRepository, SignInManager<IdentityUser> signInManager, IEmailSender emailSender, IStudentProfileRepository studentProfileRepository)
+        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IInternApplicationRepository internApplicationRepository, IInternshipRepository internshipRepository, ISavedInternRepository savedInternRepository, ICompanyRepository companyRepository, INotificationRepository notificationRepository, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, IStudentProfileRepository studentProfileRepository)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -256,6 +256,8 @@ namespace CodeIntern.Controllers
             else
             {
                 userVm.Id = user.Id;
+                userVm.FirstName = user.FirstName; 
+                userVm.LastName = user.LastName;
                 userVm.Email = user.Email;
             }
             return View(userVm);
@@ -286,6 +288,8 @@ namespace CodeIntern.Controllers
                 }
                 user.Email = model.Email;
                 user.UserName = model.Email;
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
                 var result = await _userManager.UpdateAsync(user);
 
                 if (result.Succeeded && User.IsInRole(SD.Role_Admin))
