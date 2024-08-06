@@ -74,36 +74,28 @@ namespace CodeIntern.Controllers
         [Authorize(Roles = "Admin, Company, Student")]
         public async Task<IActionResult> Details(int id, int notificationId)
         {
-            // Retrieve the internship application by ID
             InternshipApplication? internshipApplication = _internApplicationRepo.Get(x => x.InternshipApplicationId == id);
             if (internshipApplication == null)
             {
                 return NotFound();
             }
-
-            // Retrieve the user asynchronously
             var user = await _userManager.FindByIdAsync(internshipApplication.StudentId);
             if (user == null)
             {
                 return NotFound();
             }
-
-            // Create the view model
             ApplicationIndexViewModel vm = new ApplicationIndexViewModel(internshipApplication, user);
 
-            // Retrieve the notification by ID
             Notification notification = _notificationRepository.Get(x => x.NotificationId == notificationId);
             if (notification == null)
             {
                 return NotFound();
             }
 
-            // Mark the notification as read
             notification.IsRead = true;
             _notificationRepository.Update(notification);
             _notificationRepository.Save();
 
-            // Return the view with the view model
             return View(vm);
         }
 
@@ -123,29 +115,21 @@ namespace CodeIntern.Controllers
         [Authorize(Roles = "Admin, Student")]
         public IActionResult Create(ApplicationViewModel temp, int InternshipId)
         {
-            // Check if a file is uploaded
             if (temp.CvFile != null)
             {
-                // Extract the file extension
                 temp.FileExtension = Path.GetExtension(temp.CvFile.FileName).ToLower();
 
-                // Validate the file extension
                 if (temp.FileExtension != ".pdf" && temp.FileExtension != ".zip")
                 {
                     ModelState.AddModelError("CvFile", "Only PDF or ZIP files are allowed.");
-                    return View(temp);  // Return the view with the model error
+                    return View(temp);  
                 }
 
-                // Convert IFormFile to byte array
                 using (var memoryStream = new MemoryStream())
                 {
                     temp.CvFile.CopyTo(memoryStream);
                     byte[] cvBytes = memoryStream.ToArray();
-
-                    // Get the user ID
                     var userId = _userManager.GetUserId(User);
-
-                    // Save the file to the directory
                     var directoryPath = Path.Combine(SD.CvPath, InternshipId.ToString(), userId);
                     if (!Directory.Exists(directoryPath))
                     {
@@ -155,7 +139,6 @@ namespace CodeIntern.Controllers
                     var fileName = $"{temp.FirstName}_{temp.LastName}{temp.FileExtension}";
                     var newFilePath = Path.Combine(directoryPath, fileName);
 
-                    // Write the new file
                     System.IO.File.WriteAllBytes(newFilePath, cvBytes);
 
                     InternshipApplication obj = new InternshipApplication();
@@ -182,7 +165,7 @@ namespace CodeIntern.Controllers
             else
             {
                 ModelState.AddModelError("CvFile", "File upload is required.");
-                return View(temp);  // Return the view with the model error
+                return View(temp);  
             }
         }
 
@@ -247,34 +230,27 @@ namespace CodeIntern.Controllers
                 {
                     return NotFound();
                 }
-
-                // Handle CV file upload
                 if (model.CvFile != null)
                 {
-                    // Extract the file extension
                     model.FileExtension = Path.GetExtension(model.CvFile.FileName).ToLower();
 
-                    // Validate the file extension
                     if (model.FileExtension != ".pdf" && model.FileExtension != ".zip")
                     {
                         ModelState.AddModelError("CvFile", "Only PDF or ZIP files are allowed.");
-                        return View(model);  // Return the view with the model error
+                        return View(model);  
                     }
 
-                    // Convert IFormFile to byte array
                     using (var memoryStream = new MemoryStream())
                     {
                         await model.CvFile.CopyToAsync(memoryStream);
                         byte[] cvBytes = memoryStream.ToArray();
 
-                        // Get the user ID
                         var user = await _userManager.GetUserAsync(User);
                         if (user == null)
                         {
                             return Unauthorized();
                         }
 
-                        // Save the file to the directory
                         var directoryPath = Path.Combine(SD.CvPath, internshipApplication.InternshipId.ToString(), user.Id);
                         if (!Directory.Exists(directoryPath))
                         {
@@ -284,22 +260,18 @@ namespace CodeIntern.Controllers
                         var fileName = $"{model.FirstName}_{model.LastName}{model.FileExtension}";
                         var newFilePath = Path.Combine(directoryPath, fileName);
 
-                        // Delete the old file if it exists and if a new file is uploaded
                         if (!string.IsNullOrEmpty(internshipApplication.CVPath) && System.IO.File.Exists(internshipApplication.CVPath))
                         {
                             System.IO.File.Delete(internshipApplication.CVPath);
                         }
 
-                        // Write the new file
                         await System.IO.File.WriteAllBytesAsync(newFilePath, cvBytes);
 
-                        // Update the internship application with the new CV details
                         internshipApplication.CVPath = newFilePath;
                         internshipApplication.FileExtension = model.FileExtension;
                     }
                 }
 
-                // Update status if it is changed
                 if (!string.IsNullOrEmpty(model.SelectedStatus) && model.SelectedStatus != internshipApplication.Status)
                 {
                     internshipApplication.Status = model.SelectedStatus;
