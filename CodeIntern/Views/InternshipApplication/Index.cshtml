@@ -16,7 +16,8 @@
         
         <table class="table table-bordered table-striped">
             <thead>
-                <tr>
+                <tr> @if (User.IsInRole(SD.Role_Company))
+                {
                     <th>
                         First name
                     </th>
@@ -26,6 +27,13 @@
                     <th>
                         Email
                     </th>
+                }
+                     @if (User.IsInRole(SD.Role_Student))
+                    {
+                        <th>
+                            Internship title
+                        </th>
+                    }
                     <th>
                         Application status
                     </th>
@@ -36,13 +44,21 @@
                 @foreach (var obj in Model)
                 {
                     <tr>
-                        <td>@obj.FirstName</td>
-                        <td>
-                            @obj.LastName
-                        </td>
-                        <td>
-                            @obj.Email
-                        </td>
+                        @if (User.IsInRole(SD.Role_Company))
+                        {
+                            <td>@obj.FirstName</td>
+                            <td>
+                                @obj.LastName
+                            </td>
+                            <td>
+                                @obj.Email
+                        </td>}
+                        @if (User.IsInRole(SD.Role_Student))
+                        {
+                            <td>
+                                @obj.InternshipTitle
+                            </td>
+                        }
                         <td>
                             @obj.Status
                         </td>

@@ -15,16 +15,14 @@ namespace CodeIntern.Controllers
         private readonly IInternApplicationRepository _internApplicationRepo;
         private readonly IInternshipRepository _internshipRepository;
         private readonly INotificationRepository _notificationRepository;
-        private readonly IStudentProfileRepository _studentProfileRepository;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public InternshipApplicationController(IInternApplicationRepository db, IInternshipRepository internshipRepository, UserManager<ApplicationUser> userManager, INotificationRepository notificationRepository, IStudentProfileRepository studentProfileRepository)
+        public InternshipApplicationController(IInternApplicationRepository db, IInternshipRepository internshipRepository, UserManager<ApplicationUser> userManager, INotificationRepository notificationRepository)
         {
             _internApplicationRepo = db;
             _internshipRepository = internshipRepository;
             _userManager = userManager;
             _notificationRepository = notificationRepository;
-            _studentProfileRepository = studentProfileRepository;
         }
         [Authorize(Roles = "Admin,Company,Student")]
         public async Task<IActionResult> Index(int? internshipId, string? studentId)

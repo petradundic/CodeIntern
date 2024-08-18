@@ -8,6 +8,7 @@ using System.Data;
 using CodeIntern.Areas.Identity.Pages.Account;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 
 namespace CodeIntern.Controllers
 {
@@ -24,21 +25,29 @@ namespace CodeIntern.Controllers
             _registerModel = registerModel;
             _userManager = userManager;
         }
-        public IActionResult Index(List<Company>? obj)
+        public IActionResult Index()
         {
-            IEnumerable<SelectListItem> locations = _companyRepo.GetAll(u=> u.RegistrationRequest==false).Select(x => x.City).Distinct().OrderBy(city => city).Select(city => new SelectListItem { Text = city, Value = city });
+            IEnumerable<SelectListItem> locations = _companyRepo.GetAll(u => u.RegistrationRequest == false)
+                .Select(x => x.City)
+                .Distinct()
+                .OrderBy(city => city)
+                .Select(city => new SelectListItem { Text = city, Value = city });
             ViewBag.Locations = locations;
 
-            if (obj != null && obj.Count > 0)
+            List<Company> companiesList = new List<Company>();
+
+            if (TempData["FilteredCompanies"] != null)
             {
-                return View(obj);
+                companiesList = JsonConvert.DeserializeObject<List<Company>>(TempData["FilteredCompanies"].ToString());
             }
-
-            List<Company> companiesList = _companyRepo.GetAll(x => x.RegistrationRequest == false).ToList();
-
-            if (User.IsInRole(SD.Role_Admin))
+            else
             {
-                companiesList = _companyRepo.GetAll().ToList();
+                companiesList = _companyRepo.GetAll(x => x.RegistrationRequest == false).ToList();
+
+                if (User.IsInRole(SD.Role_Admin) && (TempData["IsFiltered"] == null || !(bool)TempData["IsFiltered"]))
+                {
+                    companiesList = _companyRepo.GetAll().ToList();
+                }
             }
 
             return View(companiesList);
@@ -215,7 +224,7 @@ namespace CodeIntern.Controllers
 
         public IActionResult Filter(string? location, string? registration)
         {
-            List<Company> companies = _companyRepo.GetAll().ToList();
+            List<Company>? companies = _companyRepo.GetAll().ToList();
 
             if (!string.IsNullOrEmpty(location) && location != "-")
             {
@@ -232,9 +241,14 @@ namespace CodeIntern.Controllers
                 {
                     companies = companies.Where(x => x.RegistrationRequest == true).ToList();
                 }
+                else
+                    companies = _companyRepo.GetAll().ToList();
             }
+            TempData["FilteredCompanies"] = JsonConvert.SerializeObject(companies);
+            TempData["IsFiltered"] = true;
 
-            return RedirectToAction("Index", companies);
+            return RedirectToAction("Index");
+        
         }
 
 

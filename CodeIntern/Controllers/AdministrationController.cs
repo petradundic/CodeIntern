@@ -23,11 +23,10 @@ namespace CodeIntern.Controllers
         private IInternshipRepository _internshipRepository;
         private ISavedInternRepository _savedInternRepository;
         private INotificationRepository _notificationRepository;
-        private IStudentProfileRepository _studentProfileRepository;
 
 
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IInternApplicationRepository internApplicationRepository, IInternshipRepository internshipRepository, ISavedInternRepository savedInternRepository, ICompanyRepository companyRepository, INotificationRepository notificationRepository, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, IStudentProfileRepository studentProfileRepository)
+        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IInternApplicationRepository internApplicationRepository, IInternshipRepository internshipRepository, ISavedInternRepository savedInternRepository, ICompanyRepository companyRepository, INotificationRepository notificationRepository, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -38,7 +37,6 @@ namespace CodeIntern.Controllers
             _notificationRepository = notificationRepository;
             _signInManager = signInManager;
             _emailSender = emailSender;
-            _studentProfileRepository = studentProfileRepository;
         }
 
         [Authorize(Roles = "Admin,Student,Company")]
@@ -204,15 +202,6 @@ namespace CodeIntern.Controllers
             return View();
         }
 
-        public IActionResult ManageStudentProfile()
-        {
-            var userId = _userManager.GetUserId(User);
-            StudentProfile student = _studentProfileRepository.Get(x => x.StudentId == userId);
-            if (student == null)
-                return RedirectToAction("CreateUserProfile");
-            else
-                return RedirectToAction("UpdateUserProfile");
-        }
 
         [HttpPost]
         [AllowAnonymous]

@@ -2,7 +2,8 @@
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
     <input type="hidden" name="InternshipApplicationId" value="@Model.InternshipApplicationId" />
-
+    @if (User.IsInRole(SD.Role_Student))
+    {
     <div class="form-floating py-2 col-12">
         <input asp-for="FirstName" class="form-control border-0 shadow" disabled />
         <label asp-for="FirstName" class="ms-2"></label>
@@ -17,8 +18,7 @@
         <input asp-for="Email" class="form-control border-0 shadow" disabled/>
         <label asp-for="Email" class="ms-2"></label>
     </div>
-     @if (User.IsInRole(SD.Role_Student))
-    {
+  
         <div class="form-floating py-2 col-12">
             <input asp-for="CvFile" class="form-control border-0 shadow" type="file" id="cvFile" name="CvFile" />
         <label asp-for="CvFile" class="ms-2"></label>
